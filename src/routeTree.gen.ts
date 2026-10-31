@@ -16,6 +16,7 @@ import { Route as PortalRouteImport } from './routes/portal'
 import { Route as PostSignInRouteImport } from './routes/post-sign-in'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as AdminDiscountsRouteImport } from './routes/admin/discounts'
 import { Route as AdminPlansRouteImport } from './routes/admin/plans'
 import { Route as AdminProductsRouteImport } from './routes/admin/products'
 import { Route as AdminStaffRouteImport } from './routes/admin/staff'
@@ -63,6 +64,11 @@ const SignUpRoute = SignUpRouteImport.update({
   id: '/sign-up',
   path: '/sign-up',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDiscountsRoute = AdminDiscountsRouteImport.update({
+  id: '/discounts',
+  path: '/discounts',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminPlansRoute = AdminPlansRouteImport.update({
   id: '/plans',
@@ -134,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/post-sign-in': typeof PostSignInRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/admin/discounts': typeof AdminDiscountsRoute
   '/admin/plans': typeof AdminPlansRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/staff': typeof AdminStaffRoute
@@ -155,6 +162,7 @@ export interface FileRoutesByTo {
   '/post-sign-in': typeof PostSignInRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/admin/discounts': typeof AdminDiscountsRoute
   '/admin/plans': typeof AdminPlansRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/staff': typeof AdminStaffRoute
@@ -177,6 +185,7 @@ export interface FileRoutesById {
   '/post-sign-in': typeof PostSignInRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/admin/discounts': typeof AdminDiscountsRoute
   '/admin/plans': typeof AdminPlansRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/staff': typeof AdminStaffRoute
@@ -200,6 +209,7 @@ export interface FileRouteTypes {
     | '/post-sign-in'
     | '/sign-in'
     | '/sign-up'
+    | '/admin/discounts'
     | '/admin/plans'
     | '/admin/products'
     | '/admin/staff'
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/post-sign-in'
     | '/sign-in'
     | '/sign-up'
+    | '/admin/discounts'
     | '/admin/plans'
     | '/admin/products'
     | '/admin/staff'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/post-sign-in'
     | '/sign-in'
     | '/sign-up'
+    | '/admin/discounts'
     | '/admin/plans'
     | '/admin/products'
     | '/admin/staff'
@@ -317,6 +329,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/sign-up'
       preLoaderRoute: typeof SignUpRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/discounts': {
+      id: '/admin/discounts'
+      path: '/discounts'
+      fullPath: '/admin/discounts'
+      preLoaderRoute: typeof AdminDiscountsRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/admin/plans': {
       id: '/admin/plans'
@@ -406,6 +425,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteRouteChildren {
+  AdminDiscountsRoute: typeof AdminDiscountsRoute
   AdminPlansRoute: typeof AdminPlansRoute
   AdminProductsRoute: typeof AdminProductsRoute
   AdminStaffRoute: typeof AdminStaffRoute
@@ -414,6 +434,7 @@ interface AdminRouteRouteChildren {
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminDiscountsRoute: AdminDiscountsRoute,
   AdminPlansRoute: AdminPlansRoute,
   AdminProductsRoute: AdminProductsRoute,
   AdminStaffRoute: AdminStaffRoute,

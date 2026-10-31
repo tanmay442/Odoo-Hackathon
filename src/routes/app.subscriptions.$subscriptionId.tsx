@@ -15,6 +15,8 @@ import { formatMoney } from '#/domain/money'
 import { allowedSubscriptionTargets } from '#/domain/state-machines'
 import { planListFn } from '#/features/plans/functions'
 import { productPickerFn } from '#/features/products/functions'
+import { discountPickerFn, subscriptionDiscountsFn, subscriptionPreviewFn } from '#/features/discounts/functions'
+import { NextInvoicePreviewCard } from '#/features/discounts/components/NextInvoicePreview'
 import { subscriptionGetFn, subscriptionTransitionFn, subscriptionUpdateLinesFn } from '#/features/subscriptions/functions'
 import { SubscriptionLineEditor  } from '#/features/subscriptions/components/SubscriptionLineEditor'
 import type {EditableLine} from '#/features/subscriptions/components/SubscriptionLineEditor';
@@ -24,13 +26,16 @@ const stepperStages: SubscriptionStatus[] = ['draft', 'quotation', 'confirmed', 
 
 export const Route = createFileRoute('/app/subscriptions/$subscriptionId')({
   loader: async ({ params }) => {
-    const [detail, plans, products, taxes] = await Promise.all([
+    const [detail, plans, products, taxes, preview, attached, picker] = await Promise.all([
       subscriptionGetFn({ data: { id: params.subscriptionId } }),
       planListFn(),
       productPickerFn(),
       taxPickerFn(),
+      subscriptionPreviewFn({ data: { subscriptionId: params.subscriptionId } }),
+      subscriptionDiscountsFn({ data: { subscriptionId: params.subscriptionId } }),
+      discountPickerFn(),
     ])
-    for (const result of [detail, plans, products, taxes]) {
+    for (const result of [detail, plans, products, taxes, preview, attached, picker]) {
       if (result instanceof Response) {
         if ((result).status === 401) throw redirect({ to: '/sign-in' })
         throw new Error('FORBIDDEN')
@@ -42,13 +47,16 @@ export const Route = createFileRoute('/app/subscriptions/$subscriptionId')({
       plans: plans as Exclude<typeof plans, Response>,
       products: products as Exclude<typeof products, Response>,
       taxes: taxes as Exclude<typeof taxes, Response>,
+      preview: preview as Exclude<typeof preview, Response | null>,
+      attached: attached as Exclude<typeof attached, Response | null>,
+      picker: picker as Exclude<typeof picker, Response | null>,
     }
   },
   component: SubscriptionDetailPage,
 })
 
 function SubscriptionDetailPage() {
-  const { detail, plans, products, taxes } = Route.useLoaderData()
+  const { detail, plans, products, taxes, preview, attached, picker } = Route.useLoaderData()
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
@@ -147,6 +155,13 @@ function SubscriptionDetailPage() {
           {canEditLines ? <Button label="Edit lines" onClick={() => setIsEditing(true)} /> : null}
         </Stack>
       )}
+      <NextInvoicePreviewCard
+        subscriptionId={detail.id}
+        preview={preview}
+        attached={attached}
+        picker={picker}
+        onChanged={() => void router.invalidate()}
+      />
       <Heading level={2}>Activity</Heading>
       <Table
         data={detail.events}
