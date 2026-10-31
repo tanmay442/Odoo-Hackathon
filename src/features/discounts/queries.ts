@@ -1,6 +1,6 @@
 import { and, asc, eq, inArray } from 'drizzle-orm'
 
-import type { Database } from '../../db/client'
+import type { Database, DbOrTx } from '../../db/client'
 import { discountProducts, discounts, subscriptionDiscounts } from '../../db/schema/discounts'
 
 export function listDiscounts(database: Database) {
@@ -17,7 +17,7 @@ export function listDiscountProducts(database: Database, discountId: string) {
   })
 }
 
-export async function listDiscountsWithProducts(database: Database, discountIds: string[]) {
+export async function listDiscountsWithProducts(database: DbOrTx, discountIds: string[]) {
   if (discountIds.length === 0) return new Map<string, string[]>()
   const rows = await database.query.discountProducts.findMany({
     where: inArray(discountProducts.discountId, discountIds),
@@ -31,7 +31,7 @@ export async function listDiscountsWithProducts(database: Database, discountIds:
   return byDiscount
 }
 
-export function listSubscriptionDiscounts(database: Database, subscriptionId: string) {
+export function listSubscriptionDiscounts(database: DbOrTx, subscriptionId: string) {
   return database.query.subscriptionDiscounts.findMany({
     where: eq(subscriptionDiscounts.subscriptionId, subscriptionId),
   })

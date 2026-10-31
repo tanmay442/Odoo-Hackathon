@@ -3,7 +3,21 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { getDatabase } from '../../src/db/client'
 import { customers } from '../../src/db/schema/customers'
-import { discountProducts, discounts, subscriptionDiscounts } from '../../src/db/schema/discounts'
+import {
+  discountProducts,
+  discounts,
+  subscriptionDiscounts,
+} from '../../src/db/schema/discounts'
+import {
+  invoiceDiscounts,
+  invoiceLineTaxes,
+  invoiceLines,
+  invoiceTaxes,
+  invoices,
+} from '../../src/db/schema/invoices'
+import { paymentEvents, payments } from '../../src/db/schema/payments'
+import { jobRuns } from '../../src/db/schema/job-runs'
+import { outboxEvents } from '../../src/db/schema/outbox'
 import { plans } from '../../src/db/schema/plans'
 import { productVariants, products } from '../../src/db/schema/products'
 import { staffInvites } from '../../src/db/schema/staff-invites'
@@ -40,6 +54,15 @@ import { ForbiddenError } from '../../src/lib/auth'
 const database = getDatabase()
 
 async function truncate() {
+  await database.delete(paymentEvents)
+  await database.delete(payments)
+  await database.delete(invoiceDiscounts)
+  await database.delete(invoiceLineTaxes)
+  await database.delete(invoiceTaxes)
+  await database.delete(invoiceLines)
+  await database.delete(invoices)
+  await database.delete(outboxEvents)
+  await database.delete(jobRuns)
   await database.delete(subscriptionDiscounts)
   await database.delete(subscriptionEvents)
   await database.delete(subscriptionLineTaxes)
@@ -59,10 +82,22 @@ async function truncate() {
   await database.delete(customers)
 }
 
-async function actorWithRole(clerkUserId: string, email: string, role: UserRow['role']) {
-  const user = await ensureUserRecord(database, { clerkUserId, email, displayName: email })
+async function actorWithRole(
+  clerkUserId: string,
+  email: string,
+  role: UserRow['role'],
+) {
+  const user = await ensureUserRecord(database, {
+    clerkUserId,
+    email,
+    displayName: email,
+  })
   await database.update(users).set({ role }).where(eq(users.id, user.id))
-  const reloaded = await ensureUserRecord(database, { clerkUserId, email, displayName: email })
+  const reloaded = await ensureUserRecord(database, {
+    clerkUserId,
+    email,
+    displayName: email,
+  })
   if (reloaded.role !== role) throw new Error('Role setup failed')
   return reloaded
 }
@@ -77,9 +112,21 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await truncate()
-  admin = await actorWithRole('user_discount_admin', 'discount-admin@example.com', 'admin')
-  staff = await actorWithRole('user_discount_staff', 'discount-staff@example.com', 'staff')
-  customer = await actorWithRole('user_discount_customer', 'discount-customer@example.com', 'customer')
+  admin = await actorWithRole(
+    'user_discount_admin',
+    'discount-admin@example.com',
+    'admin',
+  )
+  staff = await actorWithRole(
+    'user_discount_staff',
+    'discount-staff@example.com',
+    'staff',
+  )
+  customer = await actorWithRole(
+    'user_discount_customer',
+    'discount-customer@example.com',
+    'customer',
+  )
 })
 
 async function seedPlan() {
@@ -117,7 +164,12 @@ async function seedCustomer() {
 async function seedSubscription(options: {
   planId: string
   customerId: string
-  lines: Array<{ productId: string; quantity: number; unitPriceMinor: number; taxIds: string[] }>
+  lines: Array<{
+    productId: string
+    quantity: number
+    unitPriceMinor: number
+    taxIds: string[]
+  }>
 }) {
   return createSubscription(database, staff, {
     customerId: options.customerId,
@@ -196,12 +248,24 @@ describe('discount rules', () => {
     const subscription = await seedSubscription({
       planId: plan.id,
       customerId: buyer.id,
-      lines: [{ productId: product.id, quantity: 1, unitPriceMinor: 100000, taxIds: [] }],
+      lines: [
+        {
+          productId: product.id,
+          quantity: 1,
+          unitPriceMinor: 100000,
+          taxIds: [],
+        },
+      ],
     })
-    await attachDiscount(database, staff, { subscriptionId: subscription.id, discountId: rule.id })
+    await attachDiscount(database, staff, {
+      subscriptionId: subscription.id,
+      discountId: rule.id,
+    })
     const deleted = await deleteDiscount(database, admin, rule.id)
     expect(deleted.archived).toBe(true)
-    const stored = await database.query.discounts.findFirst({ where: eq(discounts.id, rule.id) })
+    const stored = await database.query.discounts.findFirst({
+      where: eq(discounts.id, rule.id),
+    })
     expect(stored?.isActive).toBe(false)
   })
 
@@ -232,18 +296,37 @@ describe('discount rules', () => {
     const subscription = await seedSubscription({
       planId: plan.id,
       customerId: buyer.id,
-      lines: [{ productId: product.id, quantity: 1, unitPriceMinor: 100000, taxIds: [] }],
+      lines: [
+        {
+          productId: product.id,
+          quantity: 1,
+          unitPriceMinor: 100000,
+          taxIds: [],
+        },
+      ],
     })
-    await attachDiscount(database, staff, { subscriptionId: subscription.id, discountId: rule.id })
-    await attachDiscount(database, staff, { subscriptionId: subscription.id, discountId: rule.id })
+    await attachDiscount(database, staff, {
+      subscriptionId: subscription.id,
+      discountId: rule.id,
+    })
+    await attachDiscount(database, staff, {
+      subscriptionId: subscription.id,
+      discountId: rule.id,
+    })
     const links = await database.query.subscriptionDiscounts.findMany({
       where: eq(subscriptionDiscounts.subscriptionId, subscription.id),
     })
     expect(links).toHaveLength(1)
     await expect(
-      attachDiscount(database, customer, { subscriptionId: subscription.id, discountId: rule.id }),
+      attachDiscount(database, customer, {
+        subscriptionId: subscription.id,
+        discountId: rule.id,
+      }),
     ).rejects.toBeInstanceOf(ForbiddenError)
-    await detachDiscount(database, staff, { subscriptionId: subscription.id, discountId: rule.id })
+    await detachDiscount(database, staff, {
+      subscriptionId: subscription.id,
+      discountId: rule.id,
+    })
     const after = await database.query.subscriptionDiscounts.findMany({
       where: eq(subscriptionDiscounts.subscriptionId, subscription.id),
     })
@@ -285,8 +368,18 @@ describe('next invoice preview', () => {
       planId: plan.id,
       customerId: buyer.id,
       lines: [
-        { productId: productA.id, quantity: 2, unitPriceMinor: 100000, taxIds: [taxHigh.id] },
-        { productId: productB.id, quantity: 1, unitPriceMinor: 50000, taxIds: [taxLow.id] },
+        {
+          productId: productA.id,
+          quantity: 2,
+          unitPriceMinor: 100000,
+          taxIds: [taxHigh.id],
+        },
+        {
+          productId: productB.id,
+          quantity: 1,
+          unitPriceMinor: 50000,
+          taxIds: [taxLow.id],
+        },
       ],
     })
     const rule = await createDiscount(database, admin, {
@@ -302,20 +395,43 @@ describe('next invoice preview', () => {
       maxRedemptions: null,
       isActive: true,
     })
-    await attachDiscount(database, staff, { subscriptionId: subscription.id, discountId: rule.id })
+    await attachDiscount(database, staff, {
+      subscriptionId: subscription.id,
+      discountId: rule.id,
+    })
 
     const preview = await buildNextInvoicePreview(database, subscription.id)
 
     expect(preview.subtotalMinor).toBe(250000)
     expect(preview.discountMinor).toBe(25000)
-    expect(preview.discounts).toEqual([{ discountId: rule.id, name: 'Volume 10', amountMinor: 25000, discardedMinor: 0 }])
+    expect(preview.discounts).toEqual([
+      {
+        discountId: rule.id,
+        name: 'Volume 10',
+        amountMinor: 25000,
+        discardedMinor: 0,
+      },
+    ])
     expect(preview.taxSummary).toEqual([
-      { rateBasisPoints: 500, taxIds: [taxLow.id], taxableMinor: 45000, taxMinor: 2250 },
-      { rateBasisPoints: 1800, taxIds: [taxHigh.id], taxableMinor: 180000, taxMinor: 32400 },
+      {
+        rateBasisPoints: 500,
+        taxIds: [taxLow.id],
+        taxableMinor: 45000,
+        taxMinor: 2250,
+      },
+      {
+        rateBasisPoints: 1800,
+        taxIds: [taxHigh.id],
+        taxableMinor: 180000,
+        taxMinor: 32400,
+      },
     ])
     expect(preview.taxMinor).toBe(34650)
     expect(preview.totalMinor).toBe(259650)
-    expect(preview.lines.map((row) => row.productName).sort()).toEqual(['Addon', 'Suite'])
+    expect(preview.lines.map((row) => row.productName).sort()).toEqual([
+      'Addon',
+      'Suite',
+    ])
   })
 
   it('auto-applies product discounts without an attach row and skips missed minimums', async () => {
@@ -341,8 +457,18 @@ describe('next invoice preview', () => {
       planId: plan.id,
       customerId: buyer.id,
       lines: [
-        { productId: productA.id, quantity: 1, unitPriceMinor: 100000, taxIds: [] },
-        { productId: productB.id, quantity: 1, unitPriceMinor: 50000, taxIds: [] },
+        {
+          productId: productA.id,
+          quantity: 1,
+          unitPriceMinor: 100000,
+          taxIds: [],
+        },
+        {
+          productId: productB.id,
+          quantity: 1,
+          unitPriceMinor: 50000,
+          taxIds: [],
+        },
       ],
     })
     await createDiscount(database, admin, {
@@ -411,10 +537,14 @@ describe('redemption claims under concurrency', () => {
       isActive: true,
     })
     const results = await Promise.all(
-      Array.from({ length: 10 }, () => claimDiscountRedemption(database, rule.id)),
+      Array.from({ length: 10 }, () =>
+        claimDiscountRedemption(database, rule.id),
+      ),
     )
     expect(results.filter((row) => row !== null)).toHaveLength(3)
-    const stored = await database.query.discounts.findFirst({ where: eq(discounts.id, rule.id) })
+    const stored = await database.query.discounts.findFirst({
+      where: eq(discounts.id, rule.id),
+    })
     expect(stored?.timesRedeemed).toBe(3)
     expect(await claimDiscountRedemption(database, rule.id)).toBeNull()
   })
@@ -446,7 +576,14 @@ describe('tax reference check', () => {
     await seedSubscription({
       planId: plan.id,
       customerId: buyer.id,
-      lines: [{ productId: product.id, quantity: 1, unitPriceMinor: 100000, taxIds: [live.id] }],
+      lines: [
+        {
+          productId: product.id,
+          quantity: 1,
+          unitPriceMinor: 100000,
+          taxIds: [live.id],
+        },
+      ],
     })
     expect(await hasTaxReferences(database, live.id)).toBe(true)
   })

@@ -1,6 +1,6 @@
 import { and, eq, inArray, sql } from 'drizzle-orm'
 
-import type { Database } from '../../db/client'
+import type { Database, DbOrTx } from '../../db/client'
 import type { PricingDiscountInput } from '../../domain/pricing'
 import {
   discountProducts,
@@ -153,7 +153,7 @@ export async function detachDiscount(
 // cap. Returns the claimed row, or null when the rule is exhausted, inactive,
 // or outside its window. Invoice generation treats null as "rule stopped".
 export async function claimDiscountRedemption(
-  database: Database,
+  database: DbOrTx,
   discountId: string,
   claimedAt: Date = new Date(),
 ): Promise<DiscountRow | null> {
@@ -172,7 +172,7 @@ export async function claimDiscountRedemption(
 }
 
 export async function loadPricingDiscounts(
-  database: Database,
+  database: DbOrTx,
   discountIds: string[],
 ): Promise<PricingDiscountInput[]> {
   if (discountIds.length === 0) return []

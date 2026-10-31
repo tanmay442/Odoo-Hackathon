@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 
-import type { Database } from '../../db/client'
+import type { DbOrTx } from '../../db/client'
 import { discounts } from '../../db/schema/discounts'
 import type { PricingDiscountInput, PricingLineInput } from '../../domain/pricing'
 import { isDiscountApplicable } from '../../domain/pricing'
@@ -14,7 +14,7 @@ export interface ApplicableDiscountContext {
   discounts: PricingDiscountInput[]
 }
 
-async function loadPreviewLines(database: Database, subscriptionId: string): Promise<PricingLineInput[]> {
+async function loadPreviewLines(database: DbOrTx, subscriptionId: string): Promise<PricingLineInput[]> {
   const lines = await listSubscriptionLines(database, subscriptionId)
   return Promise.all(
     lines.map(async (line) => ({
@@ -32,7 +32,7 @@ async function loadPreviewLines(database: Database, subscriptionId: string): Pro
 // live line carries one of their products. The pure pricing function applies
 // the same eligibility test again, so preview and invoice generation agree.
 export async function findApplicableDiscounts(
-  database: Database,
+  database: DbOrTx,
   subscriptionId: string,
   asOf: Date = new Date(),
 ): Promise<ApplicableDiscountContext> {

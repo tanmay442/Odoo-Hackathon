@@ -67,6 +67,11 @@ function AdminLayout() {
             href="/admin/staff"
             isSelected={location.pathname === '/admin/staff'}
           />
+          <SideNavItem
+            label="Billing"
+            href="/admin/billing"
+            isSelected={location.pathname === '/admin/billing'}
+          />
         </SideNavSection>
       </SideNav>
       <div style={{ flex: 1, padding: 24 }}>

@@ -4,6 +4,35 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { getDatabase } from '../../src/db/client'
 import { customers } from '../../src/db/schema/customers'
+import {
+  discountProducts,
+  discounts,
+  subscriptionDiscounts,
+} from '../../src/db/schema/discounts'
+import {
+  invoiceDiscounts,
+  invoiceLineTaxes,
+  invoiceLines,
+  invoiceTaxes,
+  invoices,
+} from '../../src/db/schema/invoices'
+import { paymentEvents, payments } from '../../src/db/schema/payments'
+import { jobRuns } from '../../src/db/schema/job-runs'
+import { outboxEvents } from '../../src/db/schema/outbox'
+import { plans } from '../../src/db/schema/plans'
+import { productVariants, products } from '../../src/db/schema/products'
+import {
+  subscriptionEvents,
+  subscriptionLines,
+  subscriptionLineTaxes,
+  subscriptions,
+} from '../../src/db/schema/subscriptions'
+import {
+  quotationTemplateLineTaxes,
+  quotationTemplateLines,
+  quotationTemplates,
+} from '../../src/db/schema/templates'
+import { taxes } from '../../src/db/schema/taxes'
 import { staffInvites } from '../../src/db/schema/staff-invites'
 import { users } from '../../src/db/schema/users'
 import { ForbiddenError, toHttpResponse } from '../../src/lib/auth'
@@ -12,13 +41,40 @@ import {
   requireCustomerOwnerRecord,
   requireStaffRecord,
 } from '../../src/features/users/guards'
-import { ensureUserRecord, recordStaffInvite, setUserRole } from '../../src/features/users/mutations'
+import {
+  ensureUserRecord,
+  recordStaffInvite,
+  setUserRole,
+} from '../../src/features/users/mutations'
 import { getUserByClerkId } from '../../src/features/users/queries'
 import { handleClerkWebhook } from '../../src/features/users/webhook'
 
 const database = getDatabase()
 
 async function truncate() {
+  await database.delete(paymentEvents)
+  await database.delete(payments)
+  await database.delete(invoiceDiscounts)
+  await database.delete(invoiceLineTaxes)
+  await database.delete(invoiceTaxes)
+  await database.delete(invoiceLines)
+  await database.delete(invoices)
+  await database.delete(outboxEvents)
+  await database.delete(jobRuns)
+  await database.delete(subscriptionDiscounts)
+  await database.delete(subscriptionEvents)
+  await database.delete(subscriptionLineTaxes)
+  await database.delete(subscriptionLines)
+  await database.delete(subscriptions)
+  await database.delete(discountProducts)
+  await database.delete(discounts)
+  await database.delete(quotationTemplateLineTaxes)
+  await database.delete(quotationTemplateLines)
+  await database.delete(quotationTemplates)
+  await database.delete(productVariants)
+  await database.delete(plans)
+  await database.delete(products)
+  await database.delete(taxes)
   await database.delete(users)
   await database.delete(staffInvites)
   await database.delete(customers)
@@ -49,7 +105,11 @@ function signedRequest(payload: unknown) {
   }
 }
 
-function createdPayload(clerkUserId: string, email: string, firstName = 'Test') {
+function createdPayload(
+  clerkUserId: string,
+  email: string,
+  firstName = 'Test',
+) {
   return {
     type: 'user.created',
     data: {
@@ -173,12 +233,12 @@ describe('server-side guards', () => {
       email: 'cust-gate@example.com',
       displayName: 'Cust Gate',
     })
-    await expect(requireAdminRecord(database, 'user_cust_gate')).rejects.toBeInstanceOf(
-      ForbiddenError,
-    )
-    await expect(requireStaffRecord(database, 'user_cust_gate')).rejects.toBeInstanceOf(
-      ForbiddenError,
-    )
+    await expect(
+      requireAdminRecord(database, 'user_cust_gate'),
+    ).rejects.toBeInstanceOf(ForbiddenError)
+    await expect(
+      requireStaffRecord(database, 'user_cust_gate'),
+    ).rejects.toBeInstanceOf(ForbiddenError)
     await expect(
       requireCustomerOwnerRecord(database, 'user_cust_gate', 'someone-else'),
     ).rejects.toBeInstanceOf(ForbiddenError)
@@ -200,11 +260,14 @@ describe('server-side guards', () => {
     })
     const staffRow = await getUserByClerkId(database, 'user_staff_gate')
     if (!staffRow) throw new Error('Staff row missing')
-    await database.update(users).set({ role: 'staff' }).where(eq(users.id, staffRow.id))
+    await database
+      .update(users)
+      .set({ role: 'staff' })
+      .where(eq(users.id, staffRow.id))
     await requireStaffRecord(database, 'user_staff_gate')
-    await expect(requireAdminRecord(database, 'user_staff_gate')).rejects.toBeInstanceOf(
-      ForbiddenError,
-    )
+    await expect(
+      requireAdminRecord(database, 'user_staff_gate'),
+    ).rejects.toBeInstanceOf(ForbiddenError)
   })
 })
 
@@ -216,10 +279,13 @@ describe('role changes', () => {
       displayName: 'Seed Admin',
     })
     await setUserRole(database, admin.id, 'admin')
-    await database.update(users).set({ isSeedAdmin: true }).where(eq(users.id, admin.id))
-    await expect(setUserRole(database, admin.id, 'staff')).rejects.toBeInstanceOf(
-      ForbiddenError,
-    )
+    await database
+      .update(users)
+      .set({ isSeedAdmin: true })
+      .where(eq(users.id, admin.id))
+    await expect(
+      setUserRole(database, admin.id, 'staff'),
+    ).rejects.toBeInstanceOf(ForbiddenError)
     expect((await getUserByClerkId(database, 'user_seed'))?.role).toBe('admin')
   })
 })

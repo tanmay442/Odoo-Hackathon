@@ -1,7 +1,7 @@
 import { and, asc, count, desc, eq  } from 'drizzle-orm'
 import type {SQL} from 'drizzle-orm';
 
-import type { Database } from '../../db/client'
+import type { Database, DbOrTx } from '../../db/client'
 import {
   subscriptionEvents,
   subscriptionLines,
@@ -47,14 +47,14 @@ export function getSubscription(database: Database, subscriptionId: string) {
   })
 }
 
-export function listSubscriptionLines(database: Database, subscriptionId: string) {
+export function listSubscriptionLines(database: DbOrTx, subscriptionId: string) {
   return database.query.subscriptionLines.findMany({
     where: eq(subscriptionLines.subscriptionId, subscriptionId),
     orderBy: asc(subscriptionLines.createdAt),
   })
 }
 
-export function listSubscriptionLineTaxes(database: Database, subscriptionLineId: string) {
+export function listSubscriptionLineTaxes(database: DbOrTx, subscriptionLineId: string) {
   return database.query.subscriptionLineTaxes.findMany({
     where: eq(subscriptionLineTaxes.subscriptionLineId, subscriptionLineId),
   })
