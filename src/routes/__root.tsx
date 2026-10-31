@@ -1,4 +1,6 @@
 import { ClerkProvider } from '@clerk/tanstack-react-start'
+import { Heading } from '@astryxdesign/core/Heading'
+import { Stack } from '@astryxdesign/core/Stack'
 import { Theme } from '@astryxdesign/core/theme'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
@@ -24,9 +26,21 @@ export const Route = createRootRoute({
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { title: 'Destr' },
     ],
+    links: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
   }),
   component: RootComponent,
+  errorComponent: RootError,
 })
+
+function RootError() {
+  return (
+    <main>
+      <Stack gap={3}>
+        <Heading level={1}>Something went wrong</Heading>
+      </Stack>
+    </main>
+  )
+}
 
 function RootComponent() {
   return (

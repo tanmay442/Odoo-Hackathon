@@ -5,6 +5,9 @@ import { defineConfig } from 'vite'
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
+  // Dual-stack bind: the HMR socket dials `localhost`, which resolves to
+  // 127.0.0.1 while Node would otherwise listen on ::1 only.
+  server: { host: true },
   plugins: [
     cloudflare({ viteEnvironment: { name: 'ssr' } }),
     tanstackStart(),
