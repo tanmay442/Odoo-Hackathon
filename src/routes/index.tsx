@@ -8,7 +8,7 @@ function Home() {
     <main>
       <h1>Destr</h1>
       <p>Subscription management system.</p>
-      <Button label="Get started" variant="primary" />
+      <Button label="Get started" variant="primary" href="/sign-in" />
     </main>
   )
 }
