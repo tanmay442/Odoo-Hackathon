@@ -5,7 +5,7 @@ import { customers } from '../../db/schema/customers'
 import { staffInvites } from '../../db/schema/staff-invites'
 import type { UserRole } from '../../db/schema/users'
 import { users } from '../../db/schema/users'
-import { ForbiddenError } from '../../lib/auth'
+import { ForbiddenError, isSeedAdminEmail } from '../../lib/auth'
 
 import { getUserByClerkId, getUserById } from './queries'
 
@@ -62,7 +62,31 @@ async function linkCustomer(database: Database, identity: Identity) {
 // constraint and read back the single row.
 export async function ensureUserRecord(database: Database, identity: Identity) {
   const existing = await getUserByClerkId(database, identity.clerkUserId)
-  if (existing) return existing
+  if (existing) {
+    if (isSeedAdminEmail(existing.email) && existing.role !== 'admin') {
+      const promoted = await database
+        .update(users)
+        .set({ role: 'admin', isSeedAdmin: true, updatedAt: new Date() })
+        .where(eq(users.id, existing.id))
+        .returning()
+      if (promoted.length > 0) return promoted[0]
+    }
+    return existing
+  }
+  if (isSeedAdminEmail(identity.email)) {
+    const insertedAdmin = await database
+      .insert(users)
+      .values({
+        clerkUserId: identity.clerkUserId,
+        email: normalizedEmail(identity.email),
+        role: 'admin',
+        isSeedAdmin: true,
+      })
+      .onConflictDoNothing({ target: users.clerkUserId })
+      .returning()
+    if (insertedAdmin.length > 0) return insertedAdmin[0]
+    return getUserByClerkId(database, identity.clerkUserId)
+  }
   const created = await linkCustomer(database, identity)
   if (!created) throw new Error('User upsert lost its row')
   return created

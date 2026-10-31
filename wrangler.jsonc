@@ -5,15 +5,16 @@
   "observability": { "enabled": true },
   "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat"],
-  "triggers": { "crons": ["0 * * * *", "*/5 * * * *"] },
   "hyperdrive": [
     {
       "binding": "HYPERDRIVE",
-      "id": "00000000000000000000000000000000",
+      "id": "d13ddeada5e043eaa5c449a522bbd170",
       "localConnectionString": "postgresql://destr:destr@localhost:5432/destr",
     },
   ],
   "vars": {
-    "APP_ENV": "development",
+    "APP_ENV": "production",
+    "SEED_ADMIN_EMAILS": "degeneratedestroyer58008@gmail.com",
+    "APP_URL": "https://destr.goeltanmay442.workers.dev",
   },
 }

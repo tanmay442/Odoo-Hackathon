@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, inArray, lte } from 'drizzle-orm'
+import { and, asc, count, desc, eq, gte, inArray, lte, sql } from 'drizzle-orm'
 import type { SQL } from 'drizzle-orm'
 
 import type { Database } from '../../db/client'
@@ -46,22 +46,23 @@ export async function listInvoices(database: Database, params: InvoiceListParams
     conditions.push(lte(invoices.dueDate, new Date()))
   }
   const where = conditions.length > 0 ? and(...conditions) : undefined
-  const rows = await database.query.invoices.findMany({
-    where,
-    orderBy: [asc(invoices.dueDate)],
-  })
-  const filtered = params.overdueOnly
-    ? rows.filter((row) => row.amountPaidMinor < row.totalMinor)
-    : rows
-  const sorted = [...filtered].sort((first, second) => {
-    const firstOverdue = isInvoiceOverdue(first) ? 0 : 1
-    const secondOverdue = isInvoiceOverdue(second) ? 0 : 1
-    if (firstOverdue !== secondOverdue) return firstOverdue - secondOverdue
-    return first.dueDate.getTime() - second.dueDate.getTime()
-  })
+  const overdueCase = sql`CASE WHEN ${invoices.status} = 'confirmed' AND ${invoices.dueDate} < NOW() AND ${invoices.amountPaidMinor} < ${invoices.totalMinor} THEN 0 ELSE 1 END`
+  const [rows, totalRows] = await Promise.all([
+    database.query.invoices.findMany({
+      where,
+      orderBy: [overdueCase, invoices.dueDate],
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+    }),
+    database
+      .select({ total: count() })
+      .from(invoices)
+      .where(where)
+      .then((result) => result[0]?.total ?? 0),
+  ])
   return {
-    rows: sorted.slice((page - 1) * pageSize, page * pageSize),
-    total: sorted.length,
+    rows,
+    total: totalRows,
     page,
     pageSize,
   }

@@ -22,6 +22,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:seed-admin": "tsx scripts/seed-admin.ts",
+    "db:seed": "tsx db/seed.ts",
+    "db:link-customer": "tsx scripts/link-customer.ts",
     "db:up": "docker compose up -d db",
     "db:down": "docker compose down",
     "depcruise": "depcruise src --config .dependency-cruiser.cjs"

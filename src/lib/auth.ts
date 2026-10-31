@@ -81,3 +81,12 @@ export async function currentClerkUserId(): Promise<string> {
   if (!session.userId) throw new UnauthorizedError()
   return session.userId
 }
+
+export function isSeedAdminEmail(email: string): boolean {
+  const configured = process.env.SEED_ADMIN_EMAILS ?? ''
+  return configured
+    .split(',')
+    .map((entry) => entry.trim().toLowerCase())
+    .filter(Boolean)
+    .includes(email.toLowerCase())
+}

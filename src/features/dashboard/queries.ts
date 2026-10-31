@@ -132,39 +132,44 @@ export async function getRevenueTotal(
   if (scope.toEnd) conditions.push(sql`p.verified_at <= ${scope.toEnd}`)
   if (scope.planId) conditions.push(sql`s.plan_id = ${scope.planId}`)
   if (scope.status) conditions.push(sql`s.status = ${scope.status}`)
+  const planJoin = scope.planId ?? scope.status ? sql`JOIN subscriptions s ON s.id = i.subscription_id` : sql``
   const rows = await executeRows(
     database,
     'revenueTotal',
-    sql`SELECT COALESCE(SUM(p.amount_minor), 0)::bigint AS revenue FROM payments p JOIN invoices i ON i.id = p.invoice_id JOIN subscriptions s ON s.id = i.subscription_id ${whereClause(conditions)}`,
+    sql`SELECT COALESCE(SUM(p.amount_minor), 0)::bigint AS revenue FROM payments p JOIN invoices i ON i.id = p.invoice_id ${planJoin} ${whereClause(conditions)}`,
   )
   return Number(rows[0]?.revenue ?? 0)
 }
 
 interface BalanceTotals {
-  amountMinor: number
-  invoiceCount: number
+  outstandingMinor: number
+  outstandingCount: number
+  overdueMinor: number
+  overdueCount: number
 }
 
-async function getConfirmedBalances(
+async function getBalanceTotals(
   database: Database,
   scope: DashboardScope,
-  label: string,
-  overdueBefore: Date | null,
+  now: Date,
 ): Promise<BalanceTotals> {
-  // Covering intent: invoices(status, due_date) serves the status filter and
-  // the due-date range/overdue cutoff in one index scan.
+  // One scan serves both cards: invoices(status, due_date) covers the
+  // status filter and the overdue cutoff, FILTER splits the buckets.
   const balance = sql`i.total_minor - i.amount_paid_minor`
   const conditions: SQL[] = [sql`i.status = 'confirmed'`, sql`${balance} > 0`]
   conditions.push(...invoiceScopeConditions(scope, sql`i.due_date`))
-  if (overdueBefore) conditions.push(sql`i.due_date < ${overdueBefore}`)
+  const planJoin = scope.planId ?? scope.status ? sql`JOIN subscriptions s ON s.id = i.subscription_id` : sql``
   const rows = await executeRows(
     database,
-    label,
-    sql`SELECT COALESCE(SUM(${balance}), 0)::bigint AS amount, COUNT(*)::int AS invoice_count FROM invoices i JOIN subscriptions s ON s.id = i.subscription_id ${whereClause(conditions)}`,
+    'balanceTotals',
+    sql`SELECT COALESCE(SUM(${balance}), 0)::bigint AS outstanding, COUNT(*)::int AS outstanding_count, COALESCE(SUM(${balance}) FILTER (WHERE i.due_date < ${now}), 0)::bigint AS overdue, COUNT(*) FILTER (WHERE i.due_date < ${now})::int AS overdue_count FROM invoices i ${planJoin} ${whereClause(conditions)}`,
   )
+  const row = rows.length > 0 ? rows[0] : undefined
   return {
-    amountMinor: Number(rows[0]?.amount ?? 0),
-    invoiceCount: Number(rows[0]?.invoice_count ?? 0),
+    outstandingMinor: Number(row?.outstanding ?? 0),
+    outstandingCount: Number(row?.outstanding_count ?? 0),
+    overdueMinor: Number(row?.overdue ?? 0),
+    overdueCount: Number(row?.overdue_count ?? 0),
   }
 }
 
@@ -177,10 +182,11 @@ export async function getRevenueByMonth(
   if (scope.toEnd) conditions.push(sql`p.verified_at <= ${scope.toEnd}`)
   if (scope.planId) conditions.push(sql`s.plan_id = ${scope.planId}`)
   if (scope.status) conditions.push(sql`s.status = ${scope.status}`)
+  const planJoin = scope.planId ?? scope.status ? sql`JOIN subscriptions s ON s.id = i.subscription_id` : sql``
   const rows = await executeRows(
     database,
     'revenueByMonth',
-    sql`SELECT to_char(date_trunc('month', p.verified_at), 'YYYY-MM') AS month, SUM(p.amount_minor)::bigint AS revenue FROM payments p JOIN invoices i ON i.id = p.invoice_id JOIN subscriptions s ON s.id = i.subscription_id ${whereClause(conditions)} GROUP BY 1 ORDER BY 1 LIMIT 24`,
+    sql`SELECT to_char(date_trunc('month', p.verified_at), 'YYYY-MM') AS month, SUM(p.amount_minor)::bigint AS revenue FROM payments p JOIN invoices i ON i.id = p.invoice_id ${planJoin} ${whereClause(conditions)} GROUP BY 1 ORDER BY 1 LIMIT 24`,
   )
   return rows.map((row) => ({
     month: String(row.month),
@@ -229,10 +235,11 @@ export async function getAgingBuckets(
   const balance = sql`i.total_minor - i.amount_paid_minor`
   const conditions: SQL[] = [sql`i.status = 'confirmed'`, sql`${balance} > 0`]
   conditions.push(...invoiceScopeConditions(scope, sql`i.due_date`))
+  const planJoin = scope.planId ?? scope.status ? sql`JOIN subscriptions s ON s.id = i.subscription_id` : sql``
   const rows = await executeRows(
     database,
     'agingBuckets',
-    sql`SELECT CASE WHEN i.due_date >= ${now} THEN 'current' WHEN i.due_date >= ${now}::timestamptz - interval '30 days' THEN '1-30' WHEN i.due_date >= ${now}::timestamptz - interval '60 days' THEN '31-60' ELSE '60+' END AS bucket, COUNT(*)::int AS count, COALESCE(SUM(${balance}), 0)::bigint AS amount FROM invoices i JOIN subscriptions s ON s.id = i.subscription_id ${whereClause(conditions)} GROUP BY 1`,
+    sql`SELECT CASE WHEN i.due_date >= ${now} THEN 'current' WHEN i.due_date >= ${now}::timestamptz - interval '30 days' THEN '1-30' WHEN i.due_date >= ${now}::timestamptz - interval '60 days' THEN '31-60' ELSE '60+' END AS bucket, COUNT(*)::int AS count, COALESCE(SUM(${balance}), 0)::bigint AS amount FROM invoices i ${planJoin} ${whereClause(conditions)} GROUP BY 1`,
   )
   const byBucket = new Map(rows.map((row) => [String(row.bucket), row]))
   return bucketOrder.map((bucket) => ({
@@ -248,12 +255,11 @@ export async function getDashboardSummary(
   now: Date = new Date(),
 ): Promise<DashboardSummary> {
   const scope = resolveScope(filters)
-  const [byStatus, revenueMinor, outstanding, overdue, revenueByMonth, subscriptionFlow, agingBuckets] =
+  const [byStatus, revenueMinor, balances, revenueByMonth, subscriptionFlow, agingBuckets] =
     await Promise.all([
       getSubscriptionStatusCounts(database, scope),
       getRevenueTotal(database, scope),
-      getConfirmedBalances(database, scope, 'outstandingTotals', null),
-      getConfirmedBalances(database, scope, 'overdueTotals', now),
+      getBalanceTotals(database, scope, now),
       getRevenueByMonth(database, scope),
       getSubscriptionFlow(database, scope),
       getAgingBuckets(database, scope, now),
@@ -265,10 +271,10 @@ export async function getDashboardSummary(
       .reduce((total, entry) => total + entry.count, 0),
     byStatus,
     revenueMinor,
-    outstandingMinor: outstanding.amountMinor,
-    outstandingCount: outstanding.invoiceCount,
-    overdueCount: overdue.invoiceCount,
-    overdueMinor: overdue.amountMinor,
+    outstandingMinor: balances.outstandingMinor,
+    outstandingCount: balances.outstandingCount,
+    overdueCount: balances.overdueCount,
+    overdueMinor: balances.overdueMinor,
     revenueByMonth,
     subscriptionFlow,
     agingBuckets,
