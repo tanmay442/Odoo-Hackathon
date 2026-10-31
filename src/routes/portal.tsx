@@ -20,29 +20,29 @@ export const Route = createFileRoute('/portal')({
 
 function PortalAccessError() {
   return (
-    <main>
-      <Stack gap={3}>
-        <Heading level={1}>Sign in required</Heading>
-        <Text>Your subscriptions live here. Sign in to view them.</Text>
-        <Link to="/sign-in">Go to sign-in</Link>
-      </Stack>
-    </main>
+    <Stack gap={3} padding={6}>
+      <Heading level={1}>Sign in required</Heading>
+      <Text>Your subscriptions live here. Sign in to view them.</Text>
+      <Link to="/sign-in">Go to sign-in</Link>
+    </Stack>
   )
 }
 
 function PortalLayout() {
   return (
-    <main>
-      <Stack gap={3}>
+    <Stack gap={5} padding={6}>
+      <Stack direction="horizontal" hAlign="between" vAlign="center">
+        <Text size="lg" weight="bold">
+          Destr
+        </Text>
         <Stack direction="horizontal" gap={3}>
-          <Heading level={1}>Portal</Heading>
           <Link to="/portal">Overview</Link>
           <Link to="/portal/subscriptions">Subscriptions</Link>
           <Link to="/portal/invoices">Invoices</Link>
           <Link to="/portal/account">Account</Link>
         </Stack>
-        <Outlet />
       </Stack>
-    </main>
+      <Outlet />
+    </Stack>
   )
 }
