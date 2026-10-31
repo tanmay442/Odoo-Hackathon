@@ -19,7 +19,7 @@ const customerAllowedMoves: Array<{ from: SubscriptionStatus; to: SubscriptionSt
   { from: 'closed', to: 'active' },
 ]
 
-function isCustomerMove(from: SubscriptionStatus, to: SubscriptionStatus): boolean {
+export function isCustomerSubscriptionMove(from: SubscriptionStatus, to: SubscriptionStatus): boolean {
   return customerAllowedMoves.some((move) => move.from === from && move.to === to)
 }
 
@@ -33,7 +33,7 @@ export async function transitionSubscription(
   if (!existing) throw new ForbiddenError()
   const staff = canActAsStaff(actor.role)
   if (!staff) {
-    if (actor.customerId !== existing.customerId || !isCustomerMove(existing.status, to)) {
+    if (actor.customerId !== existing.customerId || !isCustomerSubscriptionMove(existing.status, to)) {
       throw new ForbiddenError()
     }
   }

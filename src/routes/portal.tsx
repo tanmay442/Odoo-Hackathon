@@ -1,5 +1,4 @@
-import { Link, createFileRoute, redirect } from '@tanstack/react-router'
-import { Card } from '@astryxdesign/core/Card'
+import { Link, Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 import { Heading } from '@astryxdesign/core/Heading'
 import { Stack } from '@astryxdesign/core/Stack'
 import { Text } from '@astryxdesign/core/Text'
@@ -16,7 +15,7 @@ export const Route = createFileRoute('/portal')({
     return user
   },
   errorComponent: PortalAccessError,
-  component: PortalPage,
+  component: PortalLayout,
 })
 
 function PortalAccessError() {
@@ -31,15 +30,18 @@ function PortalAccessError() {
   )
 }
 
-function PortalPage() {
-  Route.useLoaderData()
+function PortalLayout() {
   return (
     <main>
-      <Stack gap={4}>
-        <Heading level={1}>My subscriptions</Heading>
-        <Card>
-          <Text>Your plans, invoices, and payments will appear here. Nothing to show yet.</Text>
-        </Card>
+      <Stack gap={3}>
+        <Stack direction="horizontal" gap={3}>
+          <Heading level={1}>Portal</Heading>
+          <Link to="/portal">Overview</Link>
+          <Link to="/portal/subscriptions">Subscriptions</Link>
+          <Link to="/portal/invoices">Invoices</Link>
+          <Link to="/portal/account">Account</Link>
+        </Stack>
+        <Outlet />
       </Stack>
     </main>
   )
