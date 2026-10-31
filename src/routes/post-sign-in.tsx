@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { LayoutContent } from '@astryxdesign/core/Layout'
 import { Text } from '@astryxdesign/core/Text'
 
 import { sessionUserFn } from '#/features/users/functions'
@@ -26,8 +25,8 @@ function PostSignInPage() {
     }
   }, [navigate])
   return (
-    <LayoutContent>
+    <main>
       <Text>Signing you in…</Text>
-    </LayoutContent>
+    </main>
   )
 }
