@@ -1,6 +1,7 @@
 export * from './counters'
 export * from './customers'
 export * from './discounts'
+export * from './email-jobs'
 export * from './invoices'
 export * from './job-runs'
 export * from './outbox'

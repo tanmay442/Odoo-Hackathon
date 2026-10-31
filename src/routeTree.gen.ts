@@ -24,6 +24,7 @@ import { Route as AdminStaffRouteImport } from './routes/admin/staff'
 import { Route as AdminTaxesRouteImport } from './routes/admin/taxes'
 import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
 import { Route as AppCustomersRouteImport } from './routes/app.customers'
+import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
 import { Route as AppInvoicesRouteImport } from './routes/app.invoices'
 import { Route as AppSubscriptionsRouteImport } from './routes/app.subscriptions'
 import { Route as AppSubscriptionsNewRouteImport } from './routes/app.subscriptions-new'
@@ -111,6 +112,11 @@ const AppCustomersRoute = AppCustomersRouteImport.update({
   path: '/customers',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppInvoicesRoute = AppInvoicesRouteImport.update({
   id: '/invoices',
   path: '/invoices',
@@ -186,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/admin/taxes': typeof AdminTaxesRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/app/customers': typeof AppCustomersRouteWithChildren
+  '/app/dashboard': typeof AppDashboardRoute
   '/app/invoices': typeof AppInvoicesRouteWithChildren
   '/app/subscriptions': typeof AppSubscriptionsRouteWithChildren
   '/app/subscriptions-new': typeof AppSubscriptionsNewRoute
@@ -214,6 +221,7 @@ export interface FileRoutesByTo {
   '/admin/taxes': typeof AdminTaxesRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/app/customers': typeof AppCustomersRouteWithChildren
+  '/app/dashboard': typeof AppDashboardRoute
   '/app/invoices': typeof AppInvoicesRouteWithChildren
   '/app/subscriptions': typeof AppSubscriptionsRouteWithChildren
   '/app/subscriptions-new': typeof AppSubscriptionsNewRoute
@@ -243,6 +251,7 @@ export interface FileRoutesById {
   '/admin/taxes': typeof AdminTaxesRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/app/customers': typeof AppCustomersRouteWithChildren
+  '/app/dashboard': typeof AppDashboardRoute
   '/app/invoices': typeof AppInvoicesRouteWithChildren
   '/app/subscriptions': typeof AppSubscriptionsRouteWithChildren
   '/app/subscriptions-new': typeof AppSubscriptionsNewRoute
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/admin/taxes'
     | '/admin/templates'
     | '/app/customers'
+    | '/app/dashboard'
     | '/app/invoices'
     | '/app/subscriptions'
     | '/app/subscriptions-new'
@@ -301,6 +311,7 @@ export interface FileRouteTypes {
     | '/admin/taxes'
     | '/admin/templates'
     | '/app/customers'
+    | '/app/dashboard'
     | '/app/invoices'
     | '/app/subscriptions'
     | '/app/subscriptions-new'
@@ -329,6 +340,7 @@ export interface FileRouteTypes {
     | '/admin/taxes'
     | '/admin/templates'
     | '/app/customers'
+    | '/app/dashboard'
     | '/app/invoices'
     | '/app/subscriptions'
     | '/app/subscriptions-new'
@@ -459,6 +471,13 @@ declare module '@tanstack/react-router' {
       path: '/customers'
       fullPath: '/app/customers'
       preLoaderRoute: typeof AppCustomersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/dashboard': {
+      id: '/app/dashboard'
+      path: '/dashboard'
+      fullPath: '/app/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/invoices': {
@@ -613,6 +632,7 @@ const AppSubscriptionsRouteWithChildren =
 
 interface AppRouteChildren {
   AppCustomersRoute: typeof AppCustomersRouteWithChildren
+  AppDashboardRoute: typeof AppDashboardRoute
   AppInvoicesRoute: typeof AppInvoicesRouteWithChildren
   AppSubscriptionsRoute: typeof AppSubscriptionsRouteWithChildren
   AppSubscriptionsNewRoute: typeof AppSubscriptionsNewRoute
@@ -621,6 +641,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppCustomersRoute: AppCustomersRouteWithChildren,
+  AppDashboardRoute: AppDashboardRoute,
   AppInvoicesRoute: AppInvoicesRouteWithChildren,
   AppSubscriptionsRoute: AppSubscriptionsRouteWithChildren,
   AppSubscriptionsNewRoute: AppSubscriptionsNewRoute,
