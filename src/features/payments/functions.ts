@@ -13,6 +13,7 @@ import { getInvoiceDetail } from '../invoices/queries'
 import { decidePayment } from './decide'
 import { PaymentError } from './errors'
 import { recordStaffPayment, submitPaymentClaim } from './initiate'
+import { notifyPaymentOutcome } from './notify'
 import {
   getPayment,
   listInvoicePaymentEvents,
@@ -46,7 +47,13 @@ export const paymentRecordFn = createServerFn({ method: 'POST' })
           database,
           await currentClerkUserId(),
         )
-        return await recordStaffPayment(database, staff, data)
+        const payment = await recordStaffPayment(database, staff, data)
+        try {
+          await notifyPaymentOutcome(database, payment, null)
+        } catch (error) {
+          console.error(JSON.stringify({ event: 'email.notify_failed', paymentId: payment.id, error: String(error) }))
+        }
+        return payment
       } catch (error) {
         return paymentFailure(error)
       }
@@ -80,10 +87,16 @@ export const paymentDecideFn = createServerFn({ method: 'POST' })
           database,
           await currentClerkUserId(),
         )
-        return await decidePayment(database, staff, data.paymentId, {
+        const decided = await decidePayment(database, staff, data.paymentId, {
           approved: data.approved,
           reason: data.reason,
         })
+        try {
+          await notifyPaymentOutcome(database, decided, data.approved ? null : data.reason)
+        } catch (error) {
+          console.error(JSON.stringify({ event: 'email.notify_failed', paymentId: decided.id, error: String(error) }))
+        }
+        return decided
       } catch (error) {
         return paymentFailure(error)
       }

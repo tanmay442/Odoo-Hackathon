@@ -2,6 +2,7 @@ import { eq, sql } from 'drizzle-orm'
 
 import type { Database, DbOrTx } from '../../db/client'
 import { counters } from '../../db/schema/counters'
+import { customers } from '../../db/schema/customers'
 import { invoiceDiscounts, invoiceLineTaxes, invoiceLines, invoiceTaxes, invoices } from '../../db/schema/invoices'
 import { outboxEvents } from '../../db/schema/outbox'
 import { plans } from '../../db/schema/plans'
@@ -13,6 +14,9 @@ import { addPeriod } from '../../domain/periods'
 import { canActAsStaff, ForbiddenError } from '../../lib/auth'
 import { findApplicableDiscounts } from '../discounts/applicability'
 import { claimDiscountRedemption } from '../discounts/mutations'
+import { deliverEmail } from '../email/queue'
+import { invoiceSentTemplate } from '../email/templates'
+import type { EmailPort } from '../../ports/email-port'
 
 import { getInvoice } from './queries'
 
@@ -193,10 +197,12 @@ export async function generatePeriodInvoice(
         await tx.insert(outboxEvents).values({
           type: 'invoice.generated',
           payload: { invoiceId: invoice.id, subscriptionId: subscription.id },
+          nextAttemptAt: now,
         })
         await tx.insert(outboxEvents).values({
           type: 'subscription.closed',
           payload: { subscriptionId: subscription.id, invoiceId: invoice.id },
+          nextAttemptAt: now,
         })
         return { outcome: 'invoiced', invoiceId: invoice.id, closed: true } as const
       }
@@ -212,6 +218,7 @@ export async function generatePeriodInvoice(
       await tx.insert(outboxEvents).values({
         type: 'invoice.generated',
         payload: { invoiceId: invoice.id, subscriptionId: subscription.id },
+        nextAttemptAt: now,
       })
       return { outcome: 'invoiced', invoiceId: invoice.id, closed: false } as const
     })
@@ -233,6 +240,41 @@ export async function confirmInvoice(database: Database, actor: UserRow, invoice
     .returning()
   if (updated.length === 0) throw new ForbiddenError()
   return updated[0]
+}
+
+export async function sendInvoice(
+  database: Database,
+  actor: UserRow,
+  invoiceId: string,
+  port?: EmailPort,
+) {
+  if (!canActAsStaff(actor.role)) throw new ForbiddenError()
+  const existing = await getInvoice(database, invoiceId)
+  if (!existing) throw new ForbiddenError()
+  if (existing.status !== 'confirmed') throw new ForbiddenError()
+  const customer = await database.query.customers.findFirst({
+    where: eq(customers.id, existing.customerId),
+  })
+  if (!customer) throw new ForbiddenError()
+  const appUrl = process.env.APP_URL ?? 'http://localhost:3000'
+  const result = await deliverEmail(
+    database,
+    {
+      template: 'invoice_sent',
+      recipient: customer.email,
+      payload: { invoiceId: existing.id, invoiceNumber: existing.number },
+      message: invoiceSentTemplate({
+        invoiceNumber: existing.number,
+        customerName: customer.displayName,
+        totalMinor: existing.totalMinor,
+        currency: 'INR',
+        dueDate: existing.dueDate.toISOString().slice(0, 10),
+        portalUrl: `${appUrl}/portal/invoices/${existing.id}`,
+      }),
+    },
+    port,
+  )
+  return { invoice: existing, email: result }
 }
 
 export async function cancelInvoice(

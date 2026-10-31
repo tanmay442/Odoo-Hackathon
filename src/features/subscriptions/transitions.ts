@@ -1,7 +1,8 @@
 import { eq } from 'drizzle-orm'
 
 import type { Database } from '../../db/client'
-import { subscriptionEvents, subscriptions  } from '../../db/schema/subscriptions'
+import { outboxEvents } from '../../db/schema/outbox'
+import { subscriptionEvents, subscriptions } from '../../db/schema/subscriptions'
 import type {SubscriptionStatus} from '../../db/schema/subscriptions';
 import type { UserRow } from '../../db/schema/users'
 import { canActAsStaff, ForbiddenError } from '../../lib/auth'
@@ -66,17 +67,41 @@ export async function transitionSubscription(
   if (to === 'paused') {
     patch.pausedAt = now
   }
-  const updated = await database
-    .update(subscriptions)
-    .set(patch)
-    .where(eq(subscriptions.id, subscriptionId))
-    .returning()
-  if (updated.length === 0) throw new ForbiddenError()
-  await database.insert(subscriptionEvents).values({
-    subscriptionId,
-    actor: `${actor.role}:${actor.id}`,
-    eventType: `status:${existing.status}->${to}`,
-    payload: null,
+  const updated = await database.transaction(async (tx) => {
+    const rows = await tx
+      .update(subscriptions)
+      .set(patch)
+      .where(eq(subscriptions.id, subscriptionId))
+      .returning()
+    if (rows.length === 0) throw new ForbiddenError()
+    await tx.insert(subscriptionEvents).values({
+      subscriptionId,
+      actor: `${actor.role}:${actor.id}`,
+      eventType: `status:${existing.status}->${to}`,
+      payload: null,
+    })
+    if (to === 'active' && existing.status !== 'active') {
+      await tx.insert(outboxEvents).values({
+        type: 'subscription.activated',
+        payload: { subscriptionId },
+        nextAttemptAt: now,
+      })
+    }
+    if (to === 'paused') {
+      await tx.insert(outboxEvents).values({
+        type: 'subscription.paused',
+        payload: { subscriptionId },
+        nextAttemptAt: now,
+      })
+    }
+    if (to === 'closed' && existing.status !== 'closed') {
+      await tx.insert(outboxEvents).values({
+        type: 'subscription.closed',
+        payload: { subscriptionId },
+        nextAttemptAt: now,
+      })
+    }
+    return rows[0]
   })
-  return updated[0]
+  return updated
 }

@@ -304,6 +304,7 @@ describe('billing lifecycle', () => {
     const events = await database.query.outboxEvents.findMany()
     expect(events.map((row) => row.type).sort()).toEqual([
       'invoice.generated',
+      'subscription.activated',
       'subscription.closed',
     ])
   })

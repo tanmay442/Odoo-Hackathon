@@ -3,6 +3,8 @@ import { desc } from 'drizzle-orm'
 import type { Database } from '../db/client'
 import { getDatabase } from '../db/client'
 import { jobRuns } from '../db/schema/job-runs'
+import type { EmailPort } from '../ports/email-port'
+import { queueExpiringSubscriptions, queueOverdueReminders } from '../features/email/scan'
 import { generatePeriodInvoice } from '../features/invoices/mutations'
 import { listDueSubscriptions } from '../features/invoices/queries'
 
@@ -12,6 +14,8 @@ export interface BillingJobSummary {
   skippedAlreadyBilled: number
   closed: number
   truncated: boolean
+  remindersQueued: number
+  expiringQueued: number
   errors: Array<{ subscriptionId: string; message: string }>
 }
 
@@ -20,6 +24,7 @@ const MAX_PERIODS_PER_SUBSCRIPTION = 100
 export async function runBillingJobWithDatabase(
   database: Database,
   now: Date = new Date(),
+  port?: EmailPort,
 ): Promise<BillingJobSummary> {
   const startedAt = new Date()
   const due = await listDueSubscriptions(database, now, 100)
@@ -29,6 +34,8 @@ export async function runBillingJobWithDatabase(
     skippedAlreadyBilled: 0,
     closed: 0,
     truncated: due.length === 100,
+    remindersQueued: 0,
+    expiringQueued: 0,
     errors: [],
   }
   for (const dueSubscription of due) {
@@ -56,6 +63,10 @@ export async function runBillingJobWithDatabase(
       break
     }
   }
+  const reminders = await queueOverdueReminders(database, now, port)
+  const expiring = await queueExpiringSubscriptions(database, now, port)
+  summary.remindersQueued = reminders.queued
+  summary.expiringQueued = expiring.queued
   await database.insert(jobRuns).values({
     jobName: 'run-billing',
     startedAt,

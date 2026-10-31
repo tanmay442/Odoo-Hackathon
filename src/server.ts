@@ -1,6 +1,7 @@
 import serverEntry from '@tanstack/react-start/server-entry'
 
 import { createDatabase } from './db/client'
+import { dispatchOutboxWithDatabase } from './jobs/dispatch-outbox'
 import { runBillingJobWithDatabase } from './jobs/run-billing'
 
 interface ScheduledEvent {
@@ -20,7 +21,13 @@ async function runScheduled(event: ScheduledEvent, env: WorkerEnv) {
   const connectionString = env.HYPERDRIVE?.connectionString ?? env.DATABASE_URL ?? process.env.DATABASE_URL
   if (!connectionString) return
   const database = createDatabase(connectionString)
-  await runBillingJobWithDatabase(database, new Date(event.scheduledTime))
+  const at = new Date(event.scheduledTime)
+  if (event.cron === '*/5 * * * *') {
+    await dispatchOutboxWithDatabase(database, { now: at })
+    return
+  }
+  await runBillingJobWithDatabase(database, at)
+  await dispatchOutboxWithDatabase(database, { now: at })
 }
 
 export default {

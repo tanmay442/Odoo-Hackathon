@@ -5,7 +5,7 @@
   "observability": { "enabled": true },
   "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat"],
-  "triggers": { "crons": ["0 * * * *"] },
+  "triggers": { "crons": ["0 * * * *", "*/5 * * * *"] },
   "hyperdrive": [
     {
       "binding": "HYPERDRIVE",

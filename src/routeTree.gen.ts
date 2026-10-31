@@ -16,13 +16,17 @@ import { Route as PortalRouteImport } from './routes/portal'
 import { Route as PostSignInRouteImport } from './routes/post-sign-in'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as AdminApiRouteImport } from './routes/admin/api'
+import { Route as AdminApiKeysRouteImport } from './routes/admin/api-keys'
 import { Route as AdminBillingRouteImport } from './routes/admin.billing'
 import { Route as AdminDiscountsRouteImport } from './routes/admin/discounts'
+import { Route as AdminEmailLogRouteImport } from './routes/admin/email-log'
 import { Route as AdminPlansRouteImport } from './routes/admin/plans'
 import { Route as AdminProductsRouteImport } from './routes/admin/products'
 import { Route as AdminStaffRouteImport } from './routes/admin/staff'
 import { Route as AdminTaxesRouteImport } from './routes/admin/taxes'
 import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
+import { Route as AdminWebhooksRouteImport } from './routes/admin/webhooks'
 import { Route as AppCustomersRouteImport } from './routes/app.customers'
 import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
 import { Route as AppInvoicesRouteImport } from './routes/app.invoices'
@@ -33,6 +37,12 @@ import { Route as PortalAccountRouteImport } from './routes/portal.account'
 import { Route as PortalInvoicesRouteImport } from './routes/portal.invoices'
 import { Route as PortalSubscriptionsRouteImport } from './routes/portal.subscriptions'
 import { Route as ApiJobsRunBillingRouteImport } from './routes/api/jobs/run-billing'
+import { Route as ApiV1CustomersRouteImport } from './routes/api/v1/customers'
+import { Route as ApiV1InvoicesRouteImport } from './routes/api/v1/invoices'
+import { Route as ApiV1PaymentsRouteImport } from './routes/api/v1/payments'
+import { Route as ApiV1PlansRouteImport } from './routes/api/v1/plans'
+import { Route as ApiV1ProductsRouteImport } from './routes/api/v1/products'
+import { Route as ApiV1SubscriptionsRouteImport } from './routes/api/v1/subscriptions'
 import { Route as ApiWebhooksClerkRouteImport } from './routes/api/webhooks/clerk'
 import { Route as AppCustomersCustomerIdRouteImport } from './routes/app.customers.$customerId'
 import { Route as AppInvoicesInvoiceIdRouteImport } from './routes/app.invoices.$invoiceId'
@@ -40,8 +50,19 @@ import { Route as AppPaymentsVerificationQueueRouteImport } from './routes/app.p
 import { Route as AppSubscriptionsSubscriptionIdRouteImport } from './routes/app.subscriptions.$subscriptionId'
 import { Route as PortalInvoicesInvoiceIdRouteImport } from './routes/portal.invoices.$invoiceId'
 import { Route as PortalSubscriptionsSubscriptionIdRouteImport } from './routes/portal.subscriptions.$subscriptionId'
+import { Route as ApiV1CustomersIdRouteImport } from './routes/api/v1/customers.$id'
+import { Route as ApiV1InvoicesIdRouteImport } from './routes/api/v1/invoices.$id'
+import { Route as ApiV1PaymentsIdRouteImport } from './routes/api/v1/payments.$id'
+import { Route as ApiV1PlansIdRouteImport } from './routes/api/v1/plans.$id'
+import { Route as ApiV1ProductsIdRouteImport } from './routes/api/v1/products.$id'
+import { Route as ApiV1SubscriptionsIdRouteImport } from './routes/api/v1/subscriptions.$id'
 import { Route as AppInvoicesInvoiceIdPrintRouteImport } from './routes/app.invoices.$invoiceId.print'
 import { Route as PortalInvoicesInvoiceIdPrintRouteImport } from './routes/portal.invoices.$invoiceId.print'
+import { Route as ApiV1InvoicesIdCancelRouteImport } from './routes/api/v1/invoices.$id.cancel'
+import { Route as ApiV1InvoicesIdConfirmRouteImport } from './routes/api/v1/invoices.$id.confirm'
+import { Route as ApiV1InvoicesIdSendRouteImport } from './routes/api/v1/invoices.$id.send'
+import { Route as ApiV1PaymentsIdVerifyRouteImport } from './routes/api/v1/payments.$id.verify'
+import { Route as ApiV1SubscriptionsIdTransitionRouteImport } from './routes/api/v1/subscriptions.$id.transition'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -78,6 +99,16 @@ const SignUpRoute = SignUpRouteImport.update({
   path: '/sign-up',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminApiRoute = AdminApiRouteImport.update({
+  id: '/api',
+  path: '/api',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminApiKeysRoute = AdminApiKeysRouteImport.update({
+  id: '/api-keys',
+  path: '/api-keys',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminBillingRoute = AdminBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
@@ -86,6 +117,11 @@ const AdminBillingRoute = AdminBillingRouteImport.update({
 const AdminDiscountsRoute = AdminDiscountsRouteImport.update({
   id: '/discounts',
   path: '/discounts',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminEmailLogRoute = AdminEmailLogRouteImport.update({
+  id: '/email-log',
+  path: '/email-log',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminPlansRoute = AdminPlansRouteImport.update({
@@ -111,6 +147,11 @@ const AdminTaxesRoute = AdminTaxesRouteImport.update({
 const AdminTemplatesRoute = AdminTemplatesRouteImport.update({
   id: '/templates',
   path: '/templates',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminWebhooksRoute = AdminWebhooksRouteImport.update({
+  id: '/webhooks',
+  path: '/webhooks',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AppCustomersRoute = AppCustomersRouteImport.update({
@@ -163,6 +204,36 @@ const ApiJobsRunBillingRoute = ApiJobsRunBillingRouteImport.update({
   path: '/api/jobs/run-billing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1CustomersRoute = ApiV1CustomersRouteImport.update({
+  id: '/api/v1/customers',
+  path: '/api/v1/customers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1InvoicesRoute = ApiV1InvoicesRouteImport.update({
+  id: '/api/v1/invoices',
+  path: '/api/v1/invoices',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1PaymentsRoute = ApiV1PaymentsRouteImport.update({
+  id: '/api/v1/payments',
+  path: '/api/v1/payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1PlansRoute = ApiV1PlansRouteImport.update({
+  id: '/api/v1/plans',
+  path: '/api/v1/plans',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1ProductsRoute = ApiV1ProductsRouteImport.update({
+  id: '/api/v1/products',
+  path: '/api/v1/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SubscriptionsRoute = ApiV1SubscriptionsRouteImport.update({
+  id: '/api/v1/subscriptions',
+  path: '/api/v1/subscriptions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiWebhooksClerkRoute = ApiWebhooksClerkRouteImport.update({
   id: '/api/webhooks/clerk',
   path: '/api/webhooks/clerk',
@@ -201,6 +272,36 @@ const PortalSubscriptionsSubscriptionIdRoute =
     path: '/$subscriptionId',
     getParentRoute: () => PortalSubscriptionsRoute,
   } as any)
+const ApiV1CustomersIdRoute = ApiV1CustomersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiV1CustomersRoute,
+} as any)
+const ApiV1InvoicesIdRoute = ApiV1InvoicesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiV1InvoicesRoute,
+} as any)
+const ApiV1PaymentsIdRoute = ApiV1PaymentsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiV1PaymentsRoute,
+} as any)
+const ApiV1PlansIdRoute = ApiV1PlansIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiV1PlansRoute,
+} as any)
+const ApiV1ProductsIdRoute = ApiV1ProductsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiV1ProductsRoute,
+} as any)
+const ApiV1SubscriptionsIdRoute = ApiV1SubscriptionsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiV1SubscriptionsRoute,
+} as any)
 const AppInvoicesInvoiceIdPrintRoute =
   AppInvoicesInvoiceIdPrintRouteImport.update({
     id: '/print',
@@ -213,6 +314,32 @@ const PortalInvoicesInvoiceIdPrintRoute =
     path: '/print',
     getParentRoute: () => PortalInvoicesInvoiceIdRoute,
   } as any)
+const ApiV1InvoicesIdCancelRoute = ApiV1InvoicesIdCancelRouteImport.update({
+  id: '/cancel',
+  path: '/cancel',
+  getParentRoute: () => ApiV1InvoicesIdRoute,
+} as any)
+const ApiV1InvoicesIdConfirmRoute = ApiV1InvoicesIdConfirmRouteImport.update({
+  id: '/confirm',
+  path: '/confirm',
+  getParentRoute: () => ApiV1InvoicesIdRoute,
+} as any)
+const ApiV1InvoicesIdSendRoute = ApiV1InvoicesIdSendRouteImport.update({
+  id: '/send',
+  path: '/send',
+  getParentRoute: () => ApiV1InvoicesIdRoute,
+} as any)
+const ApiV1PaymentsIdVerifyRoute = ApiV1PaymentsIdVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => ApiV1PaymentsIdRoute,
+} as any)
+const ApiV1SubscriptionsIdTransitionRoute =
+  ApiV1SubscriptionsIdTransitionRouteImport.update({
+    id: '/transition',
+    path: '/transition',
+    getParentRoute: () => ApiV1SubscriptionsIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -222,13 +349,17 @@ export interface FileRoutesByFullPath {
   '/post-sign-in': typeof PostSignInRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/admin/api': typeof AdminApiRoute
+  '/admin/api-keys': typeof AdminApiKeysRoute
   '/admin/billing': typeof AdminBillingRoute
   '/admin/discounts': typeof AdminDiscountsRoute
+  '/admin/email-log': typeof AdminEmailLogRoute
   '/admin/plans': typeof AdminPlansRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/staff': typeof AdminStaffRoute
   '/admin/taxes': typeof AdminTaxesRoute
   '/admin/templates': typeof AdminTemplatesRoute
+  '/admin/webhooks': typeof AdminWebhooksRoute
   '/app/customers': typeof AppCustomersRouteWithChildren
   '/app/dashboard': typeof AppDashboardRoute
   '/app/invoices': typeof AppInvoicesRouteWithChildren
@@ -239,6 +370,12 @@ export interface FileRoutesByFullPath {
   '/portal/subscriptions': typeof PortalSubscriptionsRouteWithChildren
   '/portal/': typeof PortalIndexRoute
   '/api/jobs/run-billing': typeof ApiJobsRunBillingRoute
+  '/api/v1/customers': typeof ApiV1CustomersRouteWithChildren
+  '/api/v1/invoices': typeof ApiV1InvoicesRouteWithChildren
+  '/api/v1/payments': typeof ApiV1PaymentsRouteWithChildren
+  '/api/v1/plans': typeof ApiV1PlansRouteWithChildren
+  '/api/v1/products': typeof ApiV1ProductsRouteWithChildren
+  '/api/v1/subscriptions': typeof ApiV1SubscriptionsRouteWithChildren
   '/api/webhooks/clerk': typeof ApiWebhooksClerkRoute
   '/app/customers/$customerId': typeof AppCustomersCustomerIdRoute
   '/app/invoices/$invoiceId': typeof AppInvoicesInvoiceIdRouteWithChildren
@@ -246,8 +383,19 @@ export interface FileRoutesByFullPath {
   '/app/subscriptions/$subscriptionId': typeof AppSubscriptionsSubscriptionIdRoute
   '/portal/invoices/$invoiceId': typeof PortalInvoicesInvoiceIdRouteWithChildren
   '/portal/subscriptions/$subscriptionId': typeof PortalSubscriptionsSubscriptionIdRoute
+  '/api/v1/customers/$id': typeof ApiV1CustomersIdRoute
+  '/api/v1/invoices/$id': typeof ApiV1InvoicesIdRouteWithChildren
+  '/api/v1/payments/$id': typeof ApiV1PaymentsIdRouteWithChildren
+  '/api/v1/plans/$id': typeof ApiV1PlansIdRoute
+  '/api/v1/products/$id': typeof ApiV1ProductsIdRoute
+  '/api/v1/subscriptions/$id': typeof ApiV1SubscriptionsIdRouteWithChildren
   '/app/invoices/$invoiceId/print': typeof AppInvoicesInvoiceIdPrintRoute
   '/portal/invoices/$invoiceId/print': typeof PortalInvoicesInvoiceIdPrintRoute
+  '/api/v1/invoices/$id/cancel': typeof ApiV1InvoicesIdCancelRoute
+  '/api/v1/invoices/$id/confirm': typeof ApiV1InvoicesIdConfirmRoute
+  '/api/v1/invoices/$id/send': typeof ApiV1InvoicesIdSendRoute
+  '/api/v1/payments/$id/verify': typeof ApiV1PaymentsIdVerifyRoute
+  '/api/v1/subscriptions/$id/transition': typeof ApiV1SubscriptionsIdTransitionRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -256,13 +404,17 @@ export interface FileRoutesByTo {
   '/post-sign-in': typeof PostSignInRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/admin/api': typeof AdminApiRoute
+  '/admin/api-keys': typeof AdminApiKeysRoute
   '/admin/billing': typeof AdminBillingRoute
   '/admin/discounts': typeof AdminDiscountsRoute
+  '/admin/email-log': typeof AdminEmailLogRoute
   '/admin/plans': typeof AdminPlansRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/staff': typeof AdminStaffRoute
   '/admin/taxes': typeof AdminTaxesRoute
   '/admin/templates': typeof AdminTemplatesRoute
+  '/admin/webhooks': typeof AdminWebhooksRoute
   '/app/customers': typeof AppCustomersRouteWithChildren
   '/app/dashboard': typeof AppDashboardRoute
   '/app/invoices': typeof AppInvoicesRouteWithChildren
@@ -273,6 +425,12 @@ export interface FileRoutesByTo {
   '/portal/subscriptions': typeof PortalSubscriptionsRouteWithChildren
   '/portal': typeof PortalIndexRoute
   '/api/jobs/run-billing': typeof ApiJobsRunBillingRoute
+  '/api/v1/customers': typeof ApiV1CustomersRouteWithChildren
+  '/api/v1/invoices': typeof ApiV1InvoicesRouteWithChildren
+  '/api/v1/payments': typeof ApiV1PaymentsRouteWithChildren
+  '/api/v1/plans': typeof ApiV1PlansRouteWithChildren
+  '/api/v1/products': typeof ApiV1ProductsRouteWithChildren
+  '/api/v1/subscriptions': typeof ApiV1SubscriptionsRouteWithChildren
   '/api/webhooks/clerk': typeof ApiWebhooksClerkRoute
   '/app/customers/$customerId': typeof AppCustomersCustomerIdRoute
   '/app/invoices/$invoiceId': typeof AppInvoicesInvoiceIdRouteWithChildren
@@ -280,8 +438,19 @@ export interface FileRoutesByTo {
   '/app/subscriptions/$subscriptionId': typeof AppSubscriptionsSubscriptionIdRoute
   '/portal/invoices/$invoiceId': typeof PortalInvoicesInvoiceIdRouteWithChildren
   '/portal/subscriptions/$subscriptionId': typeof PortalSubscriptionsSubscriptionIdRoute
+  '/api/v1/customers/$id': typeof ApiV1CustomersIdRoute
+  '/api/v1/invoices/$id': typeof ApiV1InvoicesIdRouteWithChildren
+  '/api/v1/payments/$id': typeof ApiV1PaymentsIdRouteWithChildren
+  '/api/v1/plans/$id': typeof ApiV1PlansIdRoute
+  '/api/v1/products/$id': typeof ApiV1ProductsIdRoute
+  '/api/v1/subscriptions/$id': typeof ApiV1SubscriptionsIdRouteWithChildren
   '/app/invoices/$invoiceId/print': typeof AppInvoicesInvoiceIdPrintRoute
   '/portal/invoices/$invoiceId/print': typeof PortalInvoicesInvoiceIdPrintRoute
+  '/api/v1/invoices/$id/cancel': typeof ApiV1InvoicesIdCancelRoute
+  '/api/v1/invoices/$id/confirm': typeof ApiV1InvoicesIdConfirmRoute
+  '/api/v1/invoices/$id/send': typeof ApiV1InvoicesIdSendRoute
+  '/api/v1/payments/$id/verify': typeof ApiV1PaymentsIdVerifyRoute
+  '/api/v1/subscriptions/$id/transition': typeof ApiV1SubscriptionsIdTransitionRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -292,13 +461,17 @@ export interface FileRoutesById {
   '/post-sign-in': typeof PostSignInRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/admin/api': typeof AdminApiRoute
+  '/admin/api-keys': typeof AdminApiKeysRoute
   '/admin/billing': typeof AdminBillingRoute
   '/admin/discounts': typeof AdminDiscountsRoute
+  '/admin/email-log': typeof AdminEmailLogRoute
   '/admin/plans': typeof AdminPlansRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/staff': typeof AdminStaffRoute
   '/admin/taxes': typeof AdminTaxesRoute
   '/admin/templates': typeof AdminTemplatesRoute
+  '/admin/webhooks': typeof AdminWebhooksRoute
   '/app/customers': typeof AppCustomersRouteWithChildren
   '/app/dashboard': typeof AppDashboardRoute
   '/app/invoices': typeof AppInvoicesRouteWithChildren
@@ -309,6 +482,12 @@ export interface FileRoutesById {
   '/portal/subscriptions': typeof PortalSubscriptionsRouteWithChildren
   '/portal/': typeof PortalIndexRoute
   '/api/jobs/run-billing': typeof ApiJobsRunBillingRoute
+  '/api/v1/customers': typeof ApiV1CustomersRouteWithChildren
+  '/api/v1/invoices': typeof ApiV1InvoicesRouteWithChildren
+  '/api/v1/payments': typeof ApiV1PaymentsRouteWithChildren
+  '/api/v1/plans': typeof ApiV1PlansRouteWithChildren
+  '/api/v1/products': typeof ApiV1ProductsRouteWithChildren
+  '/api/v1/subscriptions': typeof ApiV1SubscriptionsRouteWithChildren
   '/api/webhooks/clerk': typeof ApiWebhooksClerkRoute
   '/app/customers/$customerId': typeof AppCustomersCustomerIdRoute
   '/app/invoices/$invoiceId': typeof AppInvoicesInvoiceIdRouteWithChildren
@@ -316,8 +495,19 @@ export interface FileRoutesById {
   '/app/subscriptions/$subscriptionId': typeof AppSubscriptionsSubscriptionIdRoute
   '/portal/invoices/$invoiceId': typeof PortalInvoicesInvoiceIdRouteWithChildren
   '/portal/subscriptions/$subscriptionId': typeof PortalSubscriptionsSubscriptionIdRoute
+  '/api/v1/customers/$id': typeof ApiV1CustomersIdRoute
+  '/api/v1/invoices/$id': typeof ApiV1InvoicesIdRouteWithChildren
+  '/api/v1/payments/$id': typeof ApiV1PaymentsIdRouteWithChildren
+  '/api/v1/plans/$id': typeof ApiV1PlansIdRoute
+  '/api/v1/products/$id': typeof ApiV1ProductsIdRoute
+  '/api/v1/subscriptions/$id': typeof ApiV1SubscriptionsIdRouteWithChildren
   '/app/invoices/$invoiceId/print': typeof AppInvoicesInvoiceIdPrintRoute
   '/portal/invoices/$invoiceId/print': typeof PortalInvoicesInvoiceIdPrintRoute
+  '/api/v1/invoices/$id/cancel': typeof ApiV1InvoicesIdCancelRoute
+  '/api/v1/invoices/$id/confirm': typeof ApiV1InvoicesIdConfirmRoute
+  '/api/v1/invoices/$id/send': typeof ApiV1InvoicesIdSendRoute
+  '/api/v1/payments/$id/verify': typeof ApiV1PaymentsIdVerifyRoute
+  '/api/v1/subscriptions/$id/transition': typeof ApiV1SubscriptionsIdTransitionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -329,13 +519,17 @@ export interface FileRouteTypes {
     | '/post-sign-in'
     | '/sign-in'
     | '/sign-up'
+    | '/admin/api'
+    | '/admin/api-keys'
     | '/admin/billing'
     | '/admin/discounts'
+    | '/admin/email-log'
     | '/admin/plans'
     | '/admin/products'
     | '/admin/staff'
     | '/admin/taxes'
     | '/admin/templates'
+    | '/admin/webhooks'
     | '/app/customers'
     | '/app/dashboard'
     | '/app/invoices'
@@ -346,6 +540,12 @@ export interface FileRouteTypes {
     | '/portal/subscriptions'
     | '/portal/'
     | '/api/jobs/run-billing'
+    | '/api/v1/customers'
+    | '/api/v1/invoices'
+    | '/api/v1/payments'
+    | '/api/v1/plans'
+    | '/api/v1/products'
+    | '/api/v1/subscriptions'
     | '/api/webhooks/clerk'
     | '/app/customers/$customerId'
     | '/app/invoices/$invoiceId'
@@ -353,8 +553,19 @@ export interface FileRouteTypes {
     | '/app/subscriptions/$subscriptionId'
     | '/portal/invoices/$invoiceId'
     | '/portal/subscriptions/$subscriptionId'
+    | '/api/v1/customers/$id'
+    | '/api/v1/invoices/$id'
+    | '/api/v1/payments/$id'
+    | '/api/v1/plans/$id'
+    | '/api/v1/products/$id'
+    | '/api/v1/subscriptions/$id'
     | '/app/invoices/$invoiceId/print'
     | '/portal/invoices/$invoiceId/print'
+    | '/api/v1/invoices/$id/cancel'
+    | '/api/v1/invoices/$id/confirm'
+    | '/api/v1/invoices/$id/send'
+    | '/api/v1/payments/$id/verify'
+    | '/api/v1/subscriptions/$id/transition'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -363,13 +574,17 @@ export interface FileRouteTypes {
     | '/post-sign-in'
     | '/sign-in'
     | '/sign-up'
+    | '/admin/api'
+    | '/admin/api-keys'
     | '/admin/billing'
     | '/admin/discounts'
+    | '/admin/email-log'
     | '/admin/plans'
     | '/admin/products'
     | '/admin/staff'
     | '/admin/taxes'
     | '/admin/templates'
+    | '/admin/webhooks'
     | '/app/customers'
     | '/app/dashboard'
     | '/app/invoices'
@@ -380,6 +595,12 @@ export interface FileRouteTypes {
     | '/portal/subscriptions'
     | '/portal'
     | '/api/jobs/run-billing'
+    | '/api/v1/customers'
+    | '/api/v1/invoices'
+    | '/api/v1/payments'
+    | '/api/v1/plans'
+    | '/api/v1/products'
+    | '/api/v1/subscriptions'
     | '/api/webhooks/clerk'
     | '/app/customers/$customerId'
     | '/app/invoices/$invoiceId'
@@ -387,8 +608,19 @@ export interface FileRouteTypes {
     | '/app/subscriptions/$subscriptionId'
     | '/portal/invoices/$invoiceId'
     | '/portal/subscriptions/$subscriptionId'
+    | '/api/v1/customers/$id'
+    | '/api/v1/invoices/$id'
+    | '/api/v1/payments/$id'
+    | '/api/v1/plans/$id'
+    | '/api/v1/products/$id'
+    | '/api/v1/subscriptions/$id'
     | '/app/invoices/$invoiceId/print'
     | '/portal/invoices/$invoiceId/print'
+    | '/api/v1/invoices/$id/cancel'
+    | '/api/v1/invoices/$id/confirm'
+    | '/api/v1/invoices/$id/send'
+    | '/api/v1/payments/$id/verify'
+    | '/api/v1/subscriptions/$id/transition'
   id:
     | '__root__'
     | '/'
@@ -398,13 +630,17 @@ export interface FileRouteTypes {
     | '/post-sign-in'
     | '/sign-in'
     | '/sign-up'
+    | '/admin/api'
+    | '/admin/api-keys'
     | '/admin/billing'
     | '/admin/discounts'
+    | '/admin/email-log'
     | '/admin/plans'
     | '/admin/products'
     | '/admin/staff'
     | '/admin/taxes'
     | '/admin/templates'
+    | '/admin/webhooks'
     | '/app/customers'
     | '/app/dashboard'
     | '/app/invoices'
@@ -415,6 +651,12 @@ export interface FileRouteTypes {
     | '/portal/subscriptions'
     | '/portal/'
     | '/api/jobs/run-billing'
+    | '/api/v1/customers'
+    | '/api/v1/invoices'
+    | '/api/v1/payments'
+    | '/api/v1/plans'
+    | '/api/v1/products'
+    | '/api/v1/subscriptions'
     | '/api/webhooks/clerk'
     | '/app/customers/$customerId'
     | '/app/invoices/$invoiceId'
@@ -422,8 +664,19 @@ export interface FileRouteTypes {
     | '/app/subscriptions/$subscriptionId'
     | '/portal/invoices/$invoiceId'
     | '/portal/subscriptions/$subscriptionId'
+    | '/api/v1/customers/$id'
+    | '/api/v1/invoices/$id'
+    | '/api/v1/payments/$id'
+    | '/api/v1/plans/$id'
+    | '/api/v1/products/$id'
+    | '/api/v1/subscriptions/$id'
     | '/app/invoices/$invoiceId/print'
     | '/portal/invoices/$invoiceId/print'
+    | '/api/v1/invoices/$id/cancel'
+    | '/api/v1/invoices/$id/confirm'
+    | '/api/v1/invoices/$id/send'
+    | '/api/v1/payments/$id/verify'
+    | '/api/v1/subscriptions/$id/transition'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -435,6 +688,12 @@ export interface RootRouteChildren {
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   ApiJobsRunBillingRoute: typeof ApiJobsRunBillingRoute
+  ApiV1CustomersRoute: typeof ApiV1CustomersRouteWithChildren
+  ApiV1InvoicesRoute: typeof ApiV1InvoicesRouteWithChildren
+  ApiV1PaymentsRoute: typeof ApiV1PaymentsRouteWithChildren
+  ApiV1PlansRoute: typeof ApiV1PlansRouteWithChildren
+  ApiV1ProductsRoute: typeof ApiV1ProductsRouteWithChildren
+  ApiV1SubscriptionsRoute: typeof ApiV1SubscriptionsRouteWithChildren
   ApiWebhooksClerkRoute: typeof ApiWebhooksClerkRoute
 }
 
@@ -489,6 +748,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignUpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/api': {
+      id: '/admin/api'
+      path: '/api'
+      fullPath: '/admin/api'
+      preLoaderRoute: typeof AdminApiRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/api-keys': {
+      id: '/admin/api-keys'
+      path: '/api-keys'
+      fullPath: '/admin/api-keys'
+      preLoaderRoute: typeof AdminApiKeysRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/billing': {
       id: '/admin/billing'
       path: '/billing'
@@ -501,6 +774,13 @@ declare module '@tanstack/react-router' {
       path: '/discounts'
       fullPath: '/admin/discounts'
       preLoaderRoute: typeof AdminDiscountsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/email-log': {
+      id: '/admin/email-log'
+      path: '/email-log'
+      fullPath: '/admin/email-log'
+      preLoaderRoute: typeof AdminEmailLogRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/plans': {
@@ -536,6 +816,13 @@ declare module '@tanstack/react-router' {
       path: '/templates'
       fullPath: '/admin/templates'
       preLoaderRoute: typeof AdminTemplatesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/webhooks': {
+      id: '/admin/webhooks'
+      path: '/webhooks'
+      fullPath: '/admin/webhooks'
+      preLoaderRoute: typeof AdminWebhooksRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/app/customers': {
@@ -608,6 +895,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiJobsRunBillingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/customers': {
+      id: '/api/v1/customers'
+      path: '/api/v1/customers'
+      fullPath: '/api/v1/customers'
+      preLoaderRoute: typeof ApiV1CustomersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/invoices': {
+      id: '/api/v1/invoices'
+      path: '/api/v1/invoices'
+      fullPath: '/api/v1/invoices'
+      preLoaderRoute: typeof ApiV1InvoicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/payments': {
+      id: '/api/v1/payments'
+      path: '/api/v1/payments'
+      fullPath: '/api/v1/payments'
+      preLoaderRoute: typeof ApiV1PaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/plans': {
+      id: '/api/v1/plans'
+      path: '/api/v1/plans'
+      fullPath: '/api/v1/plans'
+      preLoaderRoute: typeof ApiV1PlansRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/products': {
+      id: '/api/v1/products'
+      path: '/api/v1/products'
+      fullPath: '/api/v1/products'
+      preLoaderRoute: typeof ApiV1ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/subscriptions': {
+      id: '/api/v1/subscriptions'
+      path: '/api/v1/subscriptions'
+      fullPath: '/api/v1/subscriptions'
+      preLoaderRoute: typeof ApiV1SubscriptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/webhooks/clerk': {
       id: '/api/webhooks/clerk'
       path: '/api/webhooks/clerk'
@@ -657,6 +986,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalSubscriptionsSubscriptionIdRouteImport
       parentRoute: typeof PortalSubscriptionsRoute
     }
+    '/api/v1/customers/$id': {
+      id: '/api/v1/customers/$id'
+      path: '/$id'
+      fullPath: '/api/v1/customers/$id'
+      preLoaderRoute: typeof ApiV1CustomersIdRouteImport
+      parentRoute: typeof ApiV1CustomersRoute
+    }
+    '/api/v1/invoices/$id': {
+      id: '/api/v1/invoices/$id'
+      path: '/$id'
+      fullPath: '/api/v1/invoices/$id'
+      preLoaderRoute: typeof ApiV1InvoicesIdRouteImport
+      parentRoute: typeof ApiV1InvoicesRoute
+    }
+    '/api/v1/payments/$id': {
+      id: '/api/v1/payments/$id'
+      path: '/$id'
+      fullPath: '/api/v1/payments/$id'
+      preLoaderRoute: typeof ApiV1PaymentsIdRouteImport
+      parentRoute: typeof ApiV1PaymentsRoute
+    }
+    '/api/v1/plans/$id': {
+      id: '/api/v1/plans/$id'
+      path: '/$id'
+      fullPath: '/api/v1/plans/$id'
+      preLoaderRoute: typeof ApiV1PlansIdRouteImport
+      parentRoute: typeof ApiV1PlansRoute
+    }
+    '/api/v1/products/$id': {
+      id: '/api/v1/products/$id'
+      path: '/$id'
+      fullPath: '/api/v1/products/$id'
+      preLoaderRoute: typeof ApiV1ProductsIdRouteImport
+      parentRoute: typeof ApiV1ProductsRoute
+    }
+    '/api/v1/subscriptions/$id': {
+      id: '/api/v1/subscriptions/$id'
+      path: '/$id'
+      fullPath: '/api/v1/subscriptions/$id'
+      preLoaderRoute: typeof ApiV1SubscriptionsIdRouteImport
+      parentRoute: typeof ApiV1SubscriptionsRoute
+    }
     '/app/invoices/$invoiceId/print': {
       id: '/app/invoices/$invoiceId/print'
       path: '/print'
@@ -671,27 +1042,70 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalInvoicesInvoiceIdPrintRouteImport
       parentRoute: typeof PortalInvoicesInvoiceIdRoute
     }
+    '/api/v1/invoices/$id/cancel': {
+      id: '/api/v1/invoices/$id/cancel'
+      path: '/cancel'
+      fullPath: '/api/v1/invoices/$id/cancel'
+      preLoaderRoute: typeof ApiV1InvoicesIdCancelRouteImport
+      parentRoute: typeof ApiV1InvoicesIdRoute
+    }
+    '/api/v1/invoices/$id/confirm': {
+      id: '/api/v1/invoices/$id/confirm'
+      path: '/confirm'
+      fullPath: '/api/v1/invoices/$id/confirm'
+      preLoaderRoute: typeof ApiV1InvoicesIdConfirmRouteImport
+      parentRoute: typeof ApiV1InvoicesIdRoute
+    }
+    '/api/v1/invoices/$id/send': {
+      id: '/api/v1/invoices/$id/send'
+      path: '/send'
+      fullPath: '/api/v1/invoices/$id/send'
+      preLoaderRoute: typeof ApiV1InvoicesIdSendRouteImport
+      parentRoute: typeof ApiV1InvoicesIdRoute
+    }
+    '/api/v1/payments/$id/verify': {
+      id: '/api/v1/payments/$id/verify'
+      path: '/verify'
+      fullPath: '/api/v1/payments/$id/verify'
+      preLoaderRoute: typeof ApiV1PaymentsIdVerifyRouteImport
+      parentRoute: typeof ApiV1PaymentsIdRoute
+    }
+    '/api/v1/subscriptions/$id/transition': {
+      id: '/api/v1/subscriptions/$id/transition'
+      path: '/transition'
+      fullPath: '/api/v1/subscriptions/$id/transition'
+      preLoaderRoute: typeof ApiV1SubscriptionsIdTransitionRouteImport
+      parentRoute: typeof ApiV1SubscriptionsIdRoute
+    }
   }
 }
 
 interface AdminRouteRouteChildren {
+  AdminApiRoute: typeof AdminApiRoute
+  AdminApiKeysRoute: typeof AdminApiKeysRoute
   AdminBillingRoute: typeof AdminBillingRoute
   AdminDiscountsRoute: typeof AdminDiscountsRoute
+  AdminEmailLogRoute: typeof AdminEmailLogRoute
   AdminPlansRoute: typeof AdminPlansRoute
   AdminProductsRoute: typeof AdminProductsRoute
   AdminStaffRoute: typeof AdminStaffRoute
   AdminTaxesRoute: typeof AdminTaxesRoute
   AdminTemplatesRoute: typeof AdminTemplatesRoute
+  AdminWebhooksRoute: typeof AdminWebhooksRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminApiRoute: AdminApiRoute,
+  AdminApiKeysRoute: AdminApiKeysRoute,
   AdminBillingRoute: AdminBillingRoute,
   AdminDiscountsRoute: AdminDiscountsRoute,
+  AdminEmailLogRoute: AdminEmailLogRoute,
   AdminPlansRoute: AdminPlansRoute,
   AdminProductsRoute: AdminProductsRoute,
   AdminStaffRoute: AdminStaffRoute,
   AdminTaxesRoute: AdminTaxesRoute,
   AdminTemplatesRoute: AdminTemplatesRoute,
+  AdminWebhooksRoute: AdminWebhooksRoute,
 }
 
 const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
@@ -819,6 +1233,116 @@ const PortalRouteChildren: PortalRouteChildren = {
 const PortalRouteWithChildren =
   PortalRoute._addFileChildren(PortalRouteChildren)
 
+interface ApiV1CustomersRouteChildren {
+  ApiV1CustomersIdRoute: typeof ApiV1CustomersIdRoute
+}
+
+const ApiV1CustomersRouteChildren: ApiV1CustomersRouteChildren = {
+  ApiV1CustomersIdRoute: ApiV1CustomersIdRoute,
+}
+
+const ApiV1CustomersRouteWithChildren = ApiV1CustomersRoute._addFileChildren(
+  ApiV1CustomersRouteChildren,
+)
+
+interface ApiV1InvoicesIdRouteChildren {
+  ApiV1InvoicesIdCancelRoute: typeof ApiV1InvoicesIdCancelRoute
+  ApiV1InvoicesIdConfirmRoute: typeof ApiV1InvoicesIdConfirmRoute
+  ApiV1InvoicesIdSendRoute: typeof ApiV1InvoicesIdSendRoute
+}
+
+const ApiV1InvoicesIdRouteChildren: ApiV1InvoicesIdRouteChildren = {
+  ApiV1InvoicesIdCancelRoute: ApiV1InvoicesIdCancelRoute,
+  ApiV1InvoicesIdConfirmRoute: ApiV1InvoicesIdConfirmRoute,
+  ApiV1InvoicesIdSendRoute: ApiV1InvoicesIdSendRoute,
+}
+
+const ApiV1InvoicesIdRouteWithChildren = ApiV1InvoicesIdRoute._addFileChildren(
+  ApiV1InvoicesIdRouteChildren,
+)
+
+interface ApiV1InvoicesRouteChildren {
+  ApiV1InvoicesIdRoute: typeof ApiV1InvoicesIdRouteWithChildren
+}
+
+const ApiV1InvoicesRouteChildren: ApiV1InvoicesRouteChildren = {
+  ApiV1InvoicesIdRoute: ApiV1InvoicesIdRouteWithChildren,
+}
+
+const ApiV1InvoicesRouteWithChildren = ApiV1InvoicesRoute._addFileChildren(
+  ApiV1InvoicesRouteChildren,
+)
+
+interface ApiV1PaymentsIdRouteChildren {
+  ApiV1PaymentsIdVerifyRoute: typeof ApiV1PaymentsIdVerifyRoute
+}
+
+const ApiV1PaymentsIdRouteChildren: ApiV1PaymentsIdRouteChildren = {
+  ApiV1PaymentsIdVerifyRoute: ApiV1PaymentsIdVerifyRoute,
+}
+
+const ApiV1PaymentsIdRouteWithChildren = ApiV1PaymentsIdRoute._addFileChildren(
+  ApiV1PaymentsIdRouteChildren,
+)
+
+interface ApiV1PaymentsRouteChildren {
+  ApiV1PaymentsIdRoute: typeof ApiV1PaymentsIdRouteWithChildren
+}
+
+const ApiV1PaymentsRouteChildren: ApiV1PaymentsRouteChildren = {
+  ApiV1PaymentsIdRoute: ApiV1PaymentsIdRouteWithChildren,
+}
+
+const ApiV1PaymentsRouteWithChildren = ApiV1PaymentsRoute._addFileChildren(
+  ApiV1PaymentsRouteChildren,
+)
+
+interface ApiV1PlansRouteChildren {
+  ApiV1PlansIdRoute: typeof ApiV1PlansIdRoute
+}
+
+const ApiV1PlansRouteChildren: ApiV1PlansRouteChildren = {
+  ApiV1PlansIdRoute: ApiV1PlansIdRoute,
+}
+
+const ApiV1PlansRouteWithChildren = ApiV1PlansRoute._addFileChildren(
+  ApiV1PlansRouteChildren,
+)
+
+interface ApiV1ProductsRouteChildren {
+  ApiV1ProductsIdRoute: typeof ApiV1ProductsIdRoute
+}
+
+const ApiV1ProductsRouteChildren: ApiV1ProductsRouteChildren = {
+  ApiV1ProductsIdRoute: ApiV1ProductsIdRoute,
+}
+
+const ApiV1ProductsRouteWithChildren = ApiV1ProductsRoute._addFileChildren(
+  ApiV1ProductsRouteChildren,
+)
+
+interface ApiV1SubscriptionsIdRouteChildren {
+  ApiV1SubscriptionsIdTransitionRoute: typeof ApiV1SubscriptionsIdTransitionRoute
+}
+
+const ApiV1SubscriptionsIdRouteChildren: ApiV1SubscriptionsIdRouteChildren = {
+  ApiV1SubscriptionsIdTransitionRoute: ApiV1SubscriptionsIdTransitionRoute,
+}
+
+const ApiV1SubscriptionsIdRouteWithChildren =
+  ApiV1SubscriptionsIdRoute._addFileChildren(ApiV1SubscriptionsIdRouteChildren)
+
+interface ApiV1SubscriptionsRouteChildren {
+  ApiV1SubscriptionsIdRoute: typeof ApiV1SubscriptionsIdRouteWithChildren
+}
+
+const ApiV1SubscriptionsRouteChildren: ApiV1SubscriptionsRouteChildren = {
+  ApiV1SubscriptionsIdRoute: ApiV1SubscriptionsIdRouteWithChildren,
+}
+
+const ApiV1SubscriptionsRouteWithChildren =
+  ApiV1SubscriptionsRoute._addFileChildren(ApiV1SubscriptionsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
@@ -828,6 +1352,12 @@ const rootRouteChildren: RootRouteChildren = {
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   ApiJobsRunBillingRoute: ApiJobsRunBillingRoute,
+  ApiV1CustomersRoute: ApiV1CustomersRouteWithChildren,
+  ApiV1InvoicesRoute: ApiV1InvoicesRouteWithChildren,
+  ApiV1PaymentsRoute: ApiV1PaymentsRouteWithChildren,
+  ApiV1PlansRoute: ApiV1PlansRouteWithChildren,
+  ApiV1ProductsRoute: ApiV1ProductsRouteWithChildren,
+  ApiV1SubscriptionsRoute: ApiV1SubscriptionsRouteWithChildren,
   ApiWebhooksClerkRoute: ApiWebhooksClerkRoute,
 }
 export const routeTree = rootRouteImport

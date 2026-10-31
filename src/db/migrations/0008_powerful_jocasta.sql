@@ -1,0 +1,1 @@
+ALTER TABLE "api_idempotency_keys" ADD CONSTRAINT "api_idempotency_key_unique" UNIQUE("api_key_id","key");

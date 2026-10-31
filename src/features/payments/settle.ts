@@ -121,6 +121,7 @@ export async function markVerified(
   await tx.insert(outboxEvents).values({
     type: 'payment.verified',
     payload: { paymentId: payment.id, invoiceId: payment.invoiceId },
+    nextAttemptAt: now,
   })
   if (becamePaid) {
     const invoice = await tx.query.invoices.findFirst({
@@ -132,6 +133,7 @@ export async function markVerified(
         invoiceId: payment.invoiceId,
         subscriptionId: invoice?.subscriptionId ?? null,
       },
+      nextAttemptAt: now,
     })
   }
   const reloaded = await tx.query.payments.findFirst({

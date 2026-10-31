@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { getDatabase } from '#/db/client'
+import { dispatchOutboxWithDatabase } from '#/jobs/dispatch-outbox'
 import { runBillingJobWithDatabase } from '#/jobs/run-billing'
 
 function unauthorized() {
@@ -19,7 +20,9 @@ export async function handleRunBilling(request: Request) {
   const expected = process.env.JOB_SECRET
   const provided = providedSecret(request)
   if (!expected || !provided || provided !== expected) return unauthorized()
-  const summary = await runBillingJobWithDatabase(getDatabase(), new Date())
+  const database = getDatabase()
+  const summary = await runBillingJobWithDatabase(database, new Date())
+  await dispatchOutboxWithDatabase(database)
   return Response.json({ data: summary })
 }
 

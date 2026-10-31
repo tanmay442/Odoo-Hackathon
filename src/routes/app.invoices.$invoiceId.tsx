@@ -15,6 +15,7 @@ import {
   invoiceCancelFn,
   invoiceConfirmFn,
   invoiceGetFn,
+  invoiceSendFn,
 } from '#/features/invoices/functions'
 import { PaymentHistory } from '#/features/payments/components/PaymentHistory'
 import { RecordPaymentForm } from '#/features/payments/components/RecordPaymentForm'
@@ -77,6 +78,16 @@ function InvoiceDetailPage() {
     await router.invalidate()
   }
 
+  async function send() {
+    setError(null)
+    const result = await invoiceSendFn({ data: { id: detail.id } })
+    if (result instanceof Response) {
+      setError('Send failed. Only confirmed invoices can be sent.')
+      return
+    }
+    await router.invalidate()
+  }
+
   return (
     <Stack gap={3}>
       <Stack direction="horizontal" gap={2}>
@@ -113,8 +124,8 @@ function InvoiceDetailPage() {
           }
         />
         <Button
-          label="Send (available in Phase 09)"
-          onClick={() => setError('Sending is wired in Phase 09.')}
+          label="Send"
+          onClick={() => void send()}
         />
       </Stack>
       {isCancelling ? (

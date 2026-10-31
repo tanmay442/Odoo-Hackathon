@@ -1,10 +1,11 @@
-import { asc, eq } from 'drizzle-orm'
+import { and, asc, desc, eq } from 'drizzle-orm'
 
 import type { Database } from '../../db/client'
 import type { InvoiceRow } from '../../db/schema/invoices'
 import { invoices } from '../../db/schema/invoices'
 import { customers } from '../../db/schema/customers'
 import { paymentEvents, payments } from '../../db/schema/payments'
+import type { PaymentStatus } from '../../db/schema/payments'
 
 import type { PaymentQueueInput } from './schema'
 
@@ -107,6 +108,29 @@ export async function listVerificationQueue(
     page,
     pageSize,
   }
+}
+
+export interface PaymentListParams {
+  invoiceId?: string
+  status?: PaymentStatus
+  page?: number
+  pageSize?: number
+}
+
+export async function listPayments(database: Database, params: PaymentListParams = {}) {
+  const page = Math.max(1, params.page ?? 1)
+  const pageSize = Math.min(100, Math.max(1, params.pageSize ?? 20))
+  const conditions = [
+    params.invoiceId ? eq(payments.invoiceId, params.invoiceId) : undefined,
+    params.status ? eq(payments.status, params.status) : undefined,
+  ].filter((condition) => condition !== undefined)
+  const rows = await database.query.payments.findMany({
+    where: conditions.length > 0 ? and(...conditions) : undefined,
+    orderBy: [desc(payments.createdAt)],
+    limit: pageSize,
+    offset: (page - 1) * pageSize,
+  })
+  return { rows, page, pageSize }
 }
 
 export function invoiceBalance(

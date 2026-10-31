@@ -11,6 +11,8 @@ export const paymentStatuses: PaymentStatus[] = [
   'refunded',
 ]
 
+export const paymentStatusSchema = z.enum(paymentStatuses)
+
 export const paymentMethods = [
   'bank_transfer',
   'cash',

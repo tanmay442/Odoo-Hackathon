@@ -4,10 +4,11 @@ import { z } from 'zod'
 import { getDatabase } from '../../db/client'
 import { currentClerkUserId, guardServerFn } from '../../lib/auth'
 import { latestJobRun, runBillingJobWithDatabase } from '../../jobs/run-billing'
+import { dispatchOutboxWithDatabase } from '../../jobs/dispatch-outbox'
 import type { BillingJobSummary } from '../../jobs/run-billing'
 import { requireAdminRecord, requireStaffRecord } from '../users/guards'
 
-import { cancelInvoice, confirmInvoice } from './mutations'
+import { cancelInvoice, confirmInvoice, sendInvoice } from './mutations'
 import { getInvoiceDetail, listDueSubscriptions, listInvoices } from './queries'
 import { invoiceCancelSchema, invoiceListSchema } from './schema'
 
@@ -53,11 +54,23 @@ export const invoiceCancelFn = createServerFn({ method: 'POST' })
     }),
   )
 
+export const invoiceSendFn = createServerFn({ method: 'POST' })
+  .validator(z.object({ id: z.uuid() }))
+  .handler(({ data }) =>
+    guardServerFn(async () => {
+      const database = getDatabase()
+      const actor = await requireStaffRecord(database, await currentClerkUserId())
+      return sendInvoice(database, actor, data.id)
+    }),
+  )
+
 export const billingRunFn = createServerFn({ method: 'POST' }).handler(() =>
   guardServerFn(async () => {
     const database = getDatabase()
     await requireAdminRecord(database, await currentClerkUserId())
-    return runBillingJobWithDatabase(database, new Date())
+    const summary = await runBillingJobWithDatabase(database, new Date())
+    await dispatchOutboxWithDatabase(database)
+    return summary
   }),
 )
 

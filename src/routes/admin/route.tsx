@@ -72,6 +72,26 @@ function AdminLayout() {
             href="/admin/billing"
             isSelected={location.pathname === '/admin/billing'}
           />
+          <SideNavItem
+            label="API keys"
+            href="/admin/api-keys"
+            isSelected={location.pathname === '/admin/api-keys'}
+          />
+          <SideNavItem
+            label="Webhooks"
+            href="/admin/webhooks"
+            isSelected={location.pathname === '/admin/webhooks'}
+          />
+          <SideNavItem
+            label="Email log"
+            href="/admin/email-log"
+            isSelected={location.pathname === '/admin/email-log'}
+          />
+          <SideNavItem
+            label="API reference"
+            href="/admin/api"
+            isSelected={location.pathname === '/admin/api'}
+          />
         </SideNavSection>
       </SideNav>
       <div style={{ flex: 1, padding: 24 }}>
