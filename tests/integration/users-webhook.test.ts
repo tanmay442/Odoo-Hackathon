@@ -153,6 +153,17 @@ describe('lazy upsert', () => {
     })
     expect(again.id).toBe(user.id)
   })
+
+  it('grants staff role on lazy upsert when the email was invited', async () => {
+    await recordStaffInvite(database, 'lazy-staff@example.com')
+    const invited = await ensureUserRecord(database, {
+      clerkUserId: 'user_lazy_staff',
+      email: 'lazy-staff@example.com',
+      displayName: 'Lazy Staff',
+    })
+    expect(invited.role).toBe('staff')
+    expect(invited.customerId).toBeNull()
+  })
 })
 
 describe('server-side guards', () => {

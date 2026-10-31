@@ -12,7 +12,7 @@ import { Text } from '@astryxdesign/core/Text'
 import { TextInput } from '@astryxdesign/core/TextInput'
 
 import { staffInviteFn, staffListFn, updateUserRoleFn } from '#/features/users/functions'
-import type { UserRow } from '#/db/schema/users'
+import type { UserRole, UserRow } from '#/db/schema/users'
 
 export const Route = createFileRoute('/admin/staff')({
   loader: async () => {
@@ -31,6 +31,16 @@ const roleBadgeVariant = {
   staff: 'neutral',
   customer: 'neutral',
 } as const
+
+function nextRoleFor(member: UserRow): UserRole {
+  if (member.role === 'admin') return 'staff'
+  return member.role === 'staff' ? 'customer' : 'staff'
+}
+
+function actionLabelFor(role: UserRole): string {
+  if (role === 'admin') return 'Demote to staff'
+  return role === 'staff' ? 'Demote to customer' : 'Promote to staff'
+}
 
 function StaffPage() {
   const members = Route.useLoaderData()
@@ -59,7 +69,7 @@ function StaffPage() {
   async function confirmRoleChange() {
     if (!roleTarget) return
     setRoleError(null)
-    const nextRole = roleTarget.role === 'staff' ? 'customer' : 'staff'
+    const nextRole = nextRoleFor(roleTarget)
     try {
       const result = await updateUserRoleFn({ data: { userId: roleTarget.id, role: nextRole } })
       if (result instanceof Response) throw new Error('Role change refused')
@@ -67,7 +77,7 @@ function StaffPage() {
       await router.invalidate()
     } catch {
       setRoleTarget(null)
-      setRoleError('Role change refused. The seeded admin keeps admin access.')
+      setRoleError('Role change failed. Try again.')
     }
   }
 
@@ -113,11 +123,11 @@ function StaffPage() {
             key: 'actions',
             header: 'Actions',
             renderCell: (member: UserRow) =>
-              member.role === 'admin' ? (
+              member.isSeedAdmin ? (
                 <Text>Seed admin</Text>
               ) : (
                 <Button
-                  label={member.role === 'staff' ? 'Demote to customer' : 'Promote to staff'}
+                  label={actionLabelFor(member.role)}
                   size="sm"
                   onClick={() => setRoleTarget(member)}
                 />
@@ -131,11 +141,11 @@ function StaffPage() {
           onOpenChange={(open) => {
             if (!open) setRoleTarget(null)
           }}
-          title={roleTarget.role === 'staff' ? 'Demote to customer?' : 'Promote to staff?'}
+          title={roleTarget.role === 'customer' ? 'Promote to staff?' : `Demote to ${nextRoleFor(roleTarget)}?`}
           description={
-            roleTarget.role === 'staff'
-              ? `${roleTarget.email} will lose access to the staff workspace.`
-              : `${roleTarget.email} will gain access to the staff workspace.`
+            nextRoleFor(roleTarget) === 'staff'
+              ? `${roleTarget.email} will gain access to the staff workspace.`
+              : `${roleTarget.email} will lose access to the staff workspace.`
           }
           actionLabel="Confirm"
           onAction={() => void confirmRoleChange()}

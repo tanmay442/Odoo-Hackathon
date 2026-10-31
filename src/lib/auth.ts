@@ -30,6 +30,24 @@ export function toHttpResponse(error: ForbiddenError | UnauthorizedError): Respo
   return Response.json({ error: error.message }, { status: error.status })
 }
 
+export function assertAdminRole(role: UserRole): void {
+  if (!canActAsAdmin(role)) throw new ForbiddenError()
+}
+
+// Single boundary for server-function failures: known auth errors map to
+// their status, everything else becomes a generic 500 with no internals.
+export async function guardServerFn<T>(work: () => Promise<T>): Promise<T | Response> {
+  try {
+    return await work()
+  } catch (error) {
+    if (error instanceof ForbiddenError || error instanceof UnauthorizedError) {
+      return toHttpResponse(error)
+    }
+    console.error('Unhandled server function error', error)
+    return Response.json({ error: 'Internal error' }, { status: 500 })
+  }
+}
+
 interface RoleGate {
   admin: boolean
   staff: boolean
