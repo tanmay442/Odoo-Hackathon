@@ -15,6 +15,13 @@
       "when": 1793426312631,
       "tag": "0001_melted_rawhide_kid",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793427827700,
+      "tag": "0002_polite_madelyne_pryor",
+      "breakpoints": true
     }
   ]
 }

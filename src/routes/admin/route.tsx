@@ -53,6 +53,11 @@ function AdminLayout() {
             isSelected={location.pathname === '/admin/taxes'}
           />
           <SideNavItem
+            label="Templates"
+            href="/admin/templates"
+            isSelected={location.pathname === '/admin/templates'}
+          />
+          <SideNavItem
             label="Staff"
             href="/admin/staff"
             isSelected={location.pathname === '/admin/staff'}

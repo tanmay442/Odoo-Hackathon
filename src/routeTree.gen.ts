@@ -20,7 +20,14 @@ import { Route as AdminPlansRouteImport } from './routes/admin/plans'
 import { Route as AdminProductsRouteImport } from './routes/admin/products'
 import { Route as AdminStaffRouteImport } from './routes/admin/staff'
 import { Route as AdminTaxesRouteImport } from './routes/admin/taxes'
+import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
+import { Route as AppCustomersRouteImport } from './routes/app.customers'
+import { Route as AppSubscriptionsRouteImport } from './routes/app.subscriptions'
+import { Route as AppSubscriptionsNewRouteImport } from './routes/app.subscriptions-new'
+import { Route as PortalAccountRouteImport } from './routes/portal.account'
 import { Route as ApiWebhooksClerkRouteImport } from './routes/api/webhooks/clerk'
+import { Route as AppCustomersCustomerIdRouteImport } from './routes/app.customers.$customerId'
+import { Route as AppSubscriptionsSubscriptionIdRouteImport } from './routes/app.subscriptions.$subscriptionId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -77,17 +84,53 @@ const AdminTaxesRoute = AdminTaxesRouteImport.update({
   path: '/taxes',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminTemplatesRoute = AdminTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AppCustomersRoute = AppCustomersRouteImport.update({
+  id: '/customers',
+  path: '/customers',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSubscriptionsRoute = AppSubscriptionsRouteImport.update({
+  id: '/subscriptions',
+  path: '/subscriptions',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSubscriptionsNewRoute = AppSubscriptionsNewRouteImport.update({
+  id: '/subscriptions-new',
+  path: '/subscriptions-new',
+  getParentRoute: () => AppRoute,
+} as any)
+const PortalAccountRoute = PortalAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => PortalRoute,
+} as any)
 const ApiWebhooksClerkRoute = ApiWebhooksClerkRouteImport.update({
   id: '/api/webhooks/clerk',
   path: '/api/webhooks/clerk',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppCustomersCustomerIdRoute = AppCustomersCustomerIdRouteImport.update({
+  id: '/$customerId',
+  path: '/$customerId',
+  getParentRoute: () => AppCustomersRoute,
+} as any)
+const AppSubscriptionsSubscriptionIdRoute =
+  AppSubscriptionsSubscriptionIdRouteImport.update({
+    id: '/$subscriptionId',
+    path: '/$subscriptionId',
+    getParentRoute: () => AppSubscriptionsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
-  '/app': typeof AppRoute
-  '/portal': typeof PortalRoute
+  '/app': typeof AppRouteWithChildren
+  '/portal': typeof PortalRouteWithChildren
   '/post-sign-in': typeof PostSignInRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -95,13 +138,20 @@ export interface FileRoutesByFullPath {
   '/admin/products': typeof AdminProductsRoute
   '/admin/staff': typeof AdminStaffRoute
   '/admin/taxes': typeof AdminTaxesRoute
+  '/admin/templates': typeof AdminTemplatesRoute
+  '/app/customers': typeof AppCustomersRouteWithChildren
+  '/app/subscriptions': typeof AppSubscriptionsRouteWithChildren
+  '/app/subscriptions-new': typeof AppSubscriptionsNewRoute
+  '/portal/account': typeof PortalAccountRoute
   '/api/webhooks/clerk': typeof ApiWebhooksClerkRoute
+  '/app/customers/$customerId': typeof AppCustomersCustomerIdRoute
+  '/app/subscriptions/$subscriptionId': typeof AppSubscriptionsSubscriptionIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
-  '/app': typeof AppRoute
-  '/portal': typeof PortalRoute
+  '/app': typeof AppRouteWithChildren
+  '/portal': typeof PortalRouteWithChildren
   '/post-sign-in': typeof PostSignInRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -109,14 +159,21 @@ export interface FileRoutesByTo {
   '/admin/products': typeof AdminProductsRoute
   '/admin/staff': typeof AdminStaffRoute
   '/admin/taxes': typeof AdminTaxesRoute
+  '/admin/templates': typeof AdminTemplatesRoute
+  '/app/customers': typeof AppCustomersRouteWithChildren
+  '/app/subscriptions': typeof AppSubscriptionsRouteWithChildren
+  '/app/subscriptions-new': typeof AppSubscriptionsNewRoute
+  '/portal/account': typeof PortalAccountRoute
   '/api/webhooks/clerk': typeof ApiWebhooksClerkRoute
+  '/app/customers/$customerId': typeof AppCustomersCustomerIdRoute
+  '/app/subscriptions/$subscriptionId': typeof AppSubscriptionsSubscriptionIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
-  '/app': typeof AppRoute
-  '/portal': typeof PortalRoute
+  '/app': typeof AppRouteWithChildren
+  '/portal': typeof PortalRouteWithChildren
   '/post-sign-in': typeof PostSignInRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -124,7 +181,14 @@ export interface FileRoutesById {
   '/admin/products': typeof AdminProductsRoute
   '/admin/staff': typeof AdminStaffRoute
   '/admin/taxes': typeof AdminTaxesRoute
+  '/admin/templates': typeof AdminTemplatesRoute
+  '/app/customers': typeof AppCustomersRouteWithChildren
+  '/app/subscriptions': typeof AppSubscriptionsRouteWithChildren
+  '/app/subscriptions-new': typeof AppSubscriptionsNewRoute
+  '/portal/account': typeof PortalAccountRoute
   '/api/webhooks/clerk': typeof ApiWebhooksClerkRoute
+  '/app/customers/$customerId': typeof AppCustomersCustomerIdRoute
+  '/app/subscriptions/$subscriptionId': typeof AppSubscriptionsSubscriptionIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -140,7 +204,14 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/staff'
     | '/admin/taxes'
+    | '/admin/templates'
+    | '/app/customers'
+    | '/app/subscriptions'
+    | '/app/subscriptions-new'
+    | '/portal/account'
     | '/api/webhooks/clerk'
+    | '/app/customers/$customerId'
+    | '/app/subscriptions/$subscriptionId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -154,7 +225,14 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/staff'
     | '/admin/taxes'
+    | '/admin/templates'
+    | '/app/customers'
+    | '/app/subscriptions'
+    | '/app/subscriptions-new'
+    | '/portal/account'
     | '/api/webhooks/clerk'
+    | '/app/customers/$customerId'
+    | '/app/subscriptions/$subscriptionId'
   id:
     | '__root__'
     | '/'
@@ -168,14 +246,21 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/staff'
     | '/admin/taxes'
+    | '/admin/templates'
+    | '/app/customers'
+    | '/app/subscriptions'
+    | '/app/subscriptions-new'
+    | '/portal/account'
     | '/api/webhooks/clerk'
+    | '/app/customers/$customerId'
+    | '/app/subscriptions/$subscriptionId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
-  AppRoute: typeof AppRoute
-  PortalRoute: typeof PortalRoute
+  AppRoute: typeof AppRouteWithChildren
+  PortalRoute: typeof PortalRouteWithChildren
   PostSignInRoute: typeof PostSignInRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
@@ -261,12 +346,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTaxesRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/templates': {
+      id: '/admin/templates'
+      path: '/templates'
+      fullPath: '/admin/templates'
+      preLoaderRoute: typeof AdminTemplatesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/app/customers': {
+      id: '/app/customers'
+      path: '/customers'
+      fullPath: '/app/customers'
+      preLoaderRoute: typeof AppCustomersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/subscriptions': {
+      id: '/app/subscriptions'
+      path: '/subscriptions'
+      fullPath: '/app/subscriptions'
+      preLoaderRoute: typeof AppSubscriptionsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/subscriptions-new': {
+      id: '/app/subscriptions-new'
+      path: '/subscriptions-new'
+      fullPath: '/app/subscriptions-new'
+      preLoaderRoute: typeof AppSubscriptionsNewRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/portal/account': {
+      id: '/portal/account'
+      path: '/account'
+      fullPath: '/portal/account'
+      preLoaderRoute: typeof PortalAccountRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/api/webhooks/clerk': {
       id: '/api/webhooks/clerk'
       path: '/api/webhooks/clerk'
       fullPath: '/api/webhooks/clerk'
       preLoaderRoute: typeof ApiWebhooksClerkRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/app/customers/$customerId': {
+      id: '/app/customers/$customerId'
+      path: '/$customerId'
+      fullPath: '/app/customers/$customerId'
+      preLoaderRoute: typeof AppCustomersCustomerIdRouteImport
+      parentRoute: typeof AppCustomersRoute
+    }
+    '/app/subscriptions/$subscriptionId': {
+      id: '/app/subscriptions/$subscriptionId'
+      path: '/$subscriptionId'
+      fullPath: '/app/subscriptions/$subscriptionId'
+      preLoaderRoute: typeof AppSubscriptionsSubscriptionIdRouteImport
+      parentRoute: typeof AppSubscriptionsRoute
     }
   }
 }
@@ -276,6 +410,7 @@ interface AdminRouteRouteChildren {
   AdminProductsRoute: typeof AdminProductsRoute
   AdminStaffRoute: typeof AdminStaffRoute
   AdminTaxesRoute: typeof AdminTaxesRoute
+  AdminTemplatesRoute: typeof AdminTemplatesRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
@@ -283,17 +418,66 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminProductsRoute: AdminProductsRoute,
   AdminStaffRoute: AdminStaffRoute,
   AdminTaxesRoute: AdminTaxesRoute,
+  AdminTemplatesRoute: AdminTemplatesRoute,
 }
 
 const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
   AdminRouteRouteChildren,
 )
 
+interface AppCustomersRouteChildren {
+  AppCustomersCustomerIdRoute: typeof AppCustomersCustomerIdRoute
+}
+
+const AppCustomersRouteChildren: AppCustomersRouteChildren = {
+  AppCustomersCustomerIdRoute: AppCustomersCustomerIdRoute,
+}
+
+const AppCustomersRouteWithChildren = AppCustomersRoute._addFileChildren(
+  AppCustomersRouteChildren,
+)
+
+interface AppSubscriptionsRouteChildren {
+  AppSubscriptionsSubscriptionIdRoute: typeof AppSubscriptionsSubscriptionIdRoute
+}
+
+const AppSubscriptionsRouteChildren: AppSubscriptionsRouteChildren = {
+  AppSubscriptionsSubscriptionIdRoute: AppSubscriptionsSubscriptionIdRoute,
+}
+
+const AppSubscriptionsRouteWithChildren =
+  AppSubscriptionsRoute._addFileChildren(AppSubscriptionsRouteChildren)
+
+interface AppRouteChildren {
+  AppCustomersRoute: typeof AppCustomersRouteWithChildren
+  AppSubscriptionsRoute: typeof AppSubscriptionsRouteWithChildren
+  AppSubscriptionsNewRoute: typeof AppSubscriptionsNewRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppCustomersRoute: AppCustomersRouteWithChildren,
+  AppSubscriptionsRoute: AppSubscriptionsRouteWithChildren,
+  AppSubscriptionsNewRoute: AppSubscriptionsNewRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
+interface PortalRouteChildren {
+  PortalAccountRoute: typeof PortalAccountRoute
+}
+
+const PortalRouteChildren: PortalRouteChildren = {
+  PortalAccountRoute: PortalAccountRoute,
+}
+
+const PortalRouteWithChildren =
+  PortalRoute._addFileChildren(PortalRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
-  AppRoute: AppRoute,
-  PortalRoute: PortalRoute,
+  AppRoute: AppRouteWithChildren,
+  PortalRoute: PortalRouteWithChildren,
   PostSignInRoute: PostSignInRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
