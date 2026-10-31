@@ -16,7 +16,10 @@ import { Route as PortalRouteImport } from './routes/portal'
 import { Route as PostSignInRouteImport } from './routes/post-sign-in'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as AdminPlansRouteImport } from './routes/admin/plans'
+import { Route as AdminProductsRouteImport } from './routes/admin/products'
 import { Route as AdminStaffRouteImport } from './routes/admin/staff'
+import { Route as AdminTaxesRouteImport } from './routes/admin/taxes'
 import { Route as ApiWebhooksClerkRouteImport } from './routes/api/webhooks/clerk'
 
 const IndexRoute = IndexRouteImport.update({
@@ -54,9 +57,24 @@ const SignUpRoute = SignUpRouteImport.update({
   path: '/sign-up',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminPlansRoute = AdminPlansRouteImport.update({
+  id: '/plans',
+  path: '/plans',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminProductsRoute = AdminProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminStaffRoute = AdminStaffRouteImport.update({
   id: '/staff',
   path: '/staff',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminTaxesRoute = AdminTaxesRouteImport.update({
+  id: '/taxes',
+  path: '/taxes',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const ApiWebhooksClerkRoute = ApiWebhooksClerkRouteImport.update({
@@ -73,7 +91,10 @@ export interface FileRoutesByFullPath {
   '/post-sign-in': typeof PostSignInRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/admin/plans': typeof AdminPlansRoute
+  '/admin/products': typeof AdminProductsRoute
   '/admin/staff': typeof AdminStaffRoute
+  '/admin/taxes': typeof AdminTaxesRoute
   '/api/webhooks/clerk': typeof ApiWebhooksClerkRoute
 }
 export interface FileRoutesByTo {
@@ -84,7 +105,10 @@ export interface FileRoutesByTo {
   '/post-sign-in': typeof PostSignInRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/admin/plans': typeof AdminPlansRoute
+  '/admin/products': typeof AdminProductsRoute
   '/admin/staff': typeof AdminStaffRoute
+  '/admin/taxes': typeof AdminTaxesRoute
   '/api/webhooks/clerk': typeof ApiWebhooksClerkRoute
 }
 export interface FileRoutesById {
@@ -96,7 +120,10 @@ export interface FileRoutesById {
   '/post-sign-in': typeof PostSignInRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/admin/plans': typeof AdminPlansRoute
+  '/admin/products': typeof AdminProductsRoute
   '/admin/staff': typeof AdminStaffRoute
+  '/admin/taxes': typeof AdminTaxesRoute
   '/api/webhooks/clerk': typeof ApiWebhooksClerkRoute
 }
 export interface FileRouteTypes {
@@ -109,7 +136,10 @@ export interface FileRouteTypes {
     | '/post-sign-in'
     | '/sign-in'
     | '/sign-up'
+    | '/admin/plans'
+    | '/admin/products'
     | '/admin/staff'
+    | '/admin/taxes'
     | '/api/webhooks/clerk'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -120,7 +150,10 @@ export interface FileRouteTypes {
     | '/post-sign-in'
     | '/sign-in'
     | '/sign-up'
+    | '/admin/plans'
+    | '/admin/products'
     | '/admin/staff'
+    | '/admin/taxes'
     | '/api/webhooks/clerk'
   id:
     | '__root__'
@@ -131,7 +164,10 @@ export interface FileRouteTypes {
     | '/post-sign-in'
     | '/sign-in'
     | '/sign-up'
+    | '/admin/plans'
+    | '/admin/products'
     | '/admin/staff'
+    | '/admin/taxes'
     | '/api/webhooks/clerk'
   fileRoutesById: FileRoutesById
 }
@@ -197,11 +233,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignUpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/plans': {
+      id: '/admin/plans'
+      path: '/plans'
+      fullPath: '/admin/plans'
+      preLoaderRoute: typeof AdminPlansRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/products': {
+      id: '/admin/products'
+      path: '/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/staff': {
       id: '/admin/staff'
       path: '/staff'
       fullPath: '/admin/staff'
       preLoaderRoute: typeof AdminStaffRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/taxes': {
+      id: '/admin/taxes'
+      path: '/taxes'
+      fullPath: '/admin/taxes'
+      preLoaderRoute: typeof AdminTaxesRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/api/webhooks/clerk': {
@@ -215,11 +272,17 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteRouteChildren {
+  AdminPlansRoute: typeof AdminPlansRoute
+  AdminProductsRoute: typeof AdminProductsRoute
   AdminStaffRoute: typeof AdminStaffRoute
+  AdminTaxesRoute: typeof AdminTaxesRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminPlansRoute: AdminPlansRoute,
+  AdminProductsRoute: AdminProductsRoute,
   AdminStaffRoute: AdminStaffRoute,
+  AdminTaxesRoute: AdminTaxesRoute,
 }
 
 const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(

@@ -38,6 +38,21 @@ function AdminLayout() {
       <SideNav header={<SideNavHeading heading="Destr admin" />}>
         <SideNavSection title="Manage">
           <SideNavItem
+            label="Products"
+            href="/admin/products"
+            isSelected={location.pathname === '/admin/products'}
+          />
+          <SideNavItem
+            label="Plans"
+            href="/admin/plans"
+            isSelected={location.pathname === '/admin/plans'}
+          />
+          <SideNavItem
+            label="Taxes"
+            href="/admin/taxes"
+            isSelected={location.pathname === '/admin/taxes'}
+          />
+          <SideNavItem
             label="Staff"
             href="/admin/staff"
             isSelected={location.pathname === '/admin/staff'}

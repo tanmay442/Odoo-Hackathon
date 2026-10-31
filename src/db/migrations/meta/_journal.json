@@ -8,6 +8,13 @@
       "when": 1793422972941,
       "tag": "0000_ordinary_johnny_storm",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793426312631,
+      "tag": "0001_melted_rawhide_kid",
+      "breakpoints": true
     }
   ]
 }

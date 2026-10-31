@@ -1,3 +1,6 @@
 export * from './customers'
+export * from './plans'
+export * from './products'
 export * from './staff-invites'
+export * from './taxes'
 export * from './users'

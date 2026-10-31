@@ -14,6 +14,10 @@ export function multiplyMoney(
   return Math.round(unitAmount) * quantity
 }
 
+export function effectiveVariantPrice(salesPriceMinor: MinorUnits, priceDeltaMinor: MinorUnits): MinorUnits {
+  return Math.round(salesPriceMinor) + Math.round(priceDeltaMinor)
+}
+
 export function formatMoney(amountMinor: MinorUnits, currency: string): string {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
