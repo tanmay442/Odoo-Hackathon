@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "destr",
+  "main": "@tanstack/react-start/server-entry",
+  "observability": { "enabled": true },
+  "compatibility_date": "2025-09-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "00000000000000000000000000000000",
+      "localConnectionString": "postgresql://destr:destr@localhost:5432/destr",
+    },
+  ],
+  "vars": {
+    "APP_ENV": "development",
+  },
+}

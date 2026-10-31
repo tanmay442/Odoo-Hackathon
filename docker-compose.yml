@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: destr
+      POSTGRES_PASSWORD: destr
+      POSTGRES_DB: destr
+    ports:
+      - '5432:5432'
+    volumes:
+      - destr-db:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U destr -d destr']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  destr-db:
