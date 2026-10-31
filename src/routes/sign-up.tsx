@@ -6,7 +6,7 @@ export const Route = createFileRoute('/sign-up')({ component: SignUpPage })
 function SignUpPage() {
   return (
     <main>
-      <SignUp routing="path" path="/sign-up" signInUrl="/sign-in" />
+      <SignUp routing="path" path="/sign-up" signInUrl="/sign-in" fallbackRedirectUrl="/post-sign-in" />
     </main>
   )
 }

@@ -21,6 +21,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
+    "db:seed-admin": "tsx scripts/seed-admin.ts",
     "db:up": "docker compose up -d db",
     "db:down": "docker compose down",
     "depcruise": "depcruise src --config .dependency-cruiser.cjs"
@@ -41,6 +42,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "resend": "^6.35.0",
+    "svix": "^2.9.1",
     "zod": "^4.6.7"
   },
   "devDependencies": {
@@ -68,6 +70,7 @@
     "eslint": "^9.20.0",
     "jsdom": "^30.1.3",
     "prettier": "^3.8.1",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.2",
     "vite": "^8.0.0",
     "vitest": "^4.1.12",
